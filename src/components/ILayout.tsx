@@ -74,12 +74,11 @@ const IFooter = styled(Footer)`
 `
 interface LayoutProps {
     children: any;
-    title: string;
 }
 
 const themeCode = { day: true, night: false }
 
-export default function ILayout({children, title} :LayoutProps) {
+export default function ILayout({children} :LayoutProps) {
     const [ themeMode, setThemeMode ] = useState(themeCode.day);
     const { scrollY } = useScroll();
     const navAnimation = useAnimation();
@@ -126,9 +125,9 @@ export default function ILayout({children, title} :LayoutProps) {
                 </Nav>
                 <Cover animate={{backgroundColor: themeMode ? 'rgb(245, 102, 135)' : 'rgb(91, 94, 118)'}}>
                     ha0peno
-                    <img src={themeMode ? dayticon : nightticon} width="250" alt="" style={{position: 'absolute', bottom: 0}}/>
+                    <img src={themeMode ? dayticon : nightticon} width="250" alt="ha0peno" style={{position: 'absolute', bottom: 0}}/>
                 </Cover>
-                <Content style={{ padding: '0 50px', height: '300vh'}}>
+                <Content style={{ padding: '5% 10%', minHeight: '100vh'}}>
                     {children}
                 </Content>
                 <IFooter>
