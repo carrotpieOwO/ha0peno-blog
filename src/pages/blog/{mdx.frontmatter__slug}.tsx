@@ -1,26 +1,31 @@
-import { graphql } from "gatsby";
+import { graphql, navigate } from "gatsby";
 import React from "react";
-import { Anchor, Card, Row } from 'antd';
+import { Anchor, Card, Col, Divider, Row, Typography, Tag } from 'antd';
 import styled from "styled-components";
+import { motion } from "framer-motion";
 import ILayout from "../../components/ILayout";
 import MDXLayout from "../../components/MDXLayout";
-import { LeftCircleOutlined, RightCircleOutlined } from "@ant-design/icons";
+import { LeftCircleTwoTone, RightCircleTwoTone } from "@ant-design/icons";
+import Seo from "../../components/SEO";
+const { Title, Text } = Typography;
 
 
-const ICard = styled(Card)`
+const ContentCard = styled(Card)`
     margin-left: auto;
     margin-right: auto;
     width: 70%;
     padding: 3em;
 `
-
+const NaviCard = styled(Card)`
+    width: 40%;
+    cursor: pointer;
+`
 interface IBlogPostProps {
     data: Queries.BlogDetailQuery;
     children: any;   
 }
 
 export default function Detail({data, children}:IBlogPostProps) {
-    // const anchor = data.mdx?.tableOfContents as any;
     const headings = Array.from(data.mdx?.tableOfContents?.items).map(item => (
         {
             key: item.url,
@@ -40,11 +45,16 @@ export default function Detail({data, children}:IBlogPostProps) {
 
     return (
         <ILayout>
-            <ICard>
-                <h1>{frontMatter?.title}</h1>
-                <h2>{frontMatter?.date}</h2>
+            <ContentCard>
+                <Tag color="magenta" style={{marginBottom: '20px'}}>{frontMatter?.category}</Tag>
+                <Title>{frontMatter?.title}</Title>
+                <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                    <Text type="secondary">{frontMatter?.date}</Text>
+                    <Text type="secondary">{frontMatter?.author} 👩🏻‍💻</Text>
+                </div>
+                <Divider/>
                 <MDXLayout>{children}</MDXLayout>
-            </ICard>
+            </ContentCard>
             {
                 headings &&
                 <Anchor items={headings} targetOffset={300} style={{position: 'fixed', top: 320, right: '10%'}}/>
@@ -52,17 +62,31 @@ export default function Detail({data, children}:IBlogPostProps) {
             <Row style={{padding: '5em 0', width: '70%', marginLeft:'auto', marginRight:'auto'}}>
                 {
                     naviData?.previous && 
-                        <Card style={{marginRight:'auto'}}>
-                            <LeftCircleOutlined />
-                            {naviData.previous.frontmatter?.title}
-                        </Card>
+                        <NaviCard 
+                            style={{marginRight:'auto'}}
+                            onClick={() => navigate(`/blog/${naviData.previous?.frontmatter?.slug}`)}
+                        >
+                            <motion.div
+                                whileHover={{x: [0, -10, 0], transition: {duration: .7}}}
+                            >
+                                <LeftCircleTwoTone twoToneColor="#eb2f96" style={{margin: '10px'}}/>
+                                <Text strong>{naviData.previous.frontmatter?.title}</Text>
+                            </motion.div>
+                        </NaviCard>
                 }
                 {
                     naviData?.next && 
-                        <Card style={{marginLeft:'auto', textAlign:'end'}}>
-                            {naviData.next.frontmatter?.title}
-                            <RightCircleOutlined />
-                        </Card>
+                        <NaviCard
+                            style={{marginLeft:'auto'}}
+                            onClick={() => navigate(`/blog/${naviData.next?.frontmatter?.slug}`)}
+                        >
+                            <motion.div style={{textAlign: 'end'}} 
+                                whileHover={{x: [0, 10, 0], transition: {duration: .7}}}
+                            >
+                                <Text strong>{naviData.next.frontmatter?.title}</Text>
+                                <RightCircleTwoTone twoToneColor="#eb2f96" style={{margin: '10px'}}/>
+                            </motion.div>
+                        </NaviCard>
                 }
             </Row>
         </ILayout>
@@ -109,3 +133,5 @@ export const query = graphql`
         }
     }
 `
+
+export const Head = ({data} :IBlogPostProps) => <Seo title={data.mdx?.frontmatter?.title as string}/>

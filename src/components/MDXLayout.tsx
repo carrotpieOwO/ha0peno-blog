@@ -1,12 +1,29 @@
 import React from "react";
 import Highlight, { defaultProps } from "prism-react-renderer";
 import theme from 'prism-react-renderer/themes/dracula'; // 테마는 github 외에도 많다
-import dracula from 'prism-react-renderer/themes/palenight';
 
 import { MDXProvider } from "@mdx-js/react";
 import { Divider, Typography, Card } from 'antd';
+import styled from "styled-components";
 
 const { Title, Paragraph, Text, Link } = Typography;
+
+const Circle = styled.div`
+    width: 20px;
+    height: 20px;
+    background-color: ${props => props.color};
+    border-radius: 10px;
+`;
+
+const CodeBlockHeader = () => {
+    return (
+        <div style={{display: 'flex', gap: '10px'}}>
+            <Circle color={'#FF5F56'}/>
+            <Circle color={'#FFBD2E'}/>
+            <Circle color={'#27C93F'}/>
+        </div>
+    )
+}
 
 // codeblock 컴포넌트
 const CodeBlock = ({ children }:any) => {
@@ -22,7 +39,9 @@ const CodeBlock = ({ children }:any) => {
             theme={theme}
         >
             {({ className, tokens, getLineProps, getTokenProps }) => (
-                <Card extra={<a href="#">More</a>} style={{background:'black'}}>
+                <div>
+               
+                <Card extra={<CodeBlockHeader/>} style={{background:'#1f1f1f'}}>
                     <pre className={className}>
                         {tokens.map((line, i) => (
                             <div {...getLineProps({ line, key: i })}>
@@ -33,6 +52,7 @@ const CodeBlock = ({ children }:any) => {
                         ))}
                     </pre>
                 </Card>
+                </div>
             )}
         </Highlight>
     );

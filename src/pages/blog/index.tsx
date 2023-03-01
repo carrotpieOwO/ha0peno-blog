@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { graphql, HeadFC, PageProps } from "gatsby"
+import { graphql, HeadFC, navigate, PageProps } from "gatsby"
 import ILayout from "../../components/ILayout"
-import { Card, List } from 'antd';
+import { Card, List, Row, Col, Typography } from 'antd';
 import { GatsbyImage, getImage } from "gatsby-plugin-image";
 import styled from "styled-components";
+import Seo from "../../components/SEO";
+import { FolderTwoTone } from "@ant-design/icons";
 
-const Container = styled.div`
-    display: grid;
-    grid-template-columns: 1fr 9fr;
-`
+const { Title, Text } = Typography;
 
 export default function Blog({data}: PageProps<Queries.BlogsQuery>) {
   const blogData = Array.from(data.allMdx.nodes).map(blog => ({
@@ -24,6 +23,7 @@ export default function Blog({data}: PageProps<Queries.BlogsQuery>) {
 
   const [ category, setCategory ] = useState('all');
   const [ viewData, setViewData ] = useState([...blogData]);
+  const [ hover, setHover ] = useState('');
 
   useEffect(() => {
     if(category !== 'all') {
@@ -37,47 +37,62 @@ export default function Blog({data}: PageProps<Queries.BlogsQuery>) {
 
   return (
     <ILayout>
-        <Container>
-        <ul>
-            {
-                categories.map(category => 
-                    <li onClick={() => setCategory(category!)}>{category}</li>    
-                )   
-            }
-        </ul>
-        <Card >
-            {category}({viewData.length})
-            <List
-                itemLayout="vertical"
-                size="large"
-                pagination={{
-                    onChange: (page) => {
-                        console.log(page);
-                    },
-                    align: 'center', 
-                    pageSize: 10,
-                }}
-                dataSource = {viewData}
-                renderItem={(item) => (
-                    <List.Item
-                        key={item.title}
-                        extra={
-                        <GatsbyImage image={getImage(item.thumbnail!)!} alt='test'/>
-                        }
-                    >
-                        <div>{item.category}</div>
-                        <List.Item.Meta
-                          title={<a href={item.href}>{item.title}</a>}
-                          description={item.description}
-                          style={{margin: '30px 0'}}
-                        />
-                        <div>{item.date}</div>
-                    </List.Item>
-                    )}
-            >
+        <Row>
+          <Col span={4}>
+            <List>
+                {
+                  categories.map(category => 
+                    <List.Item style={{borderBlockEnd:'none'}}>
+                      <List.Item.Meta
+                        avatar={<FolderTwoTone twoToneColor="#eb2f96" style={{marginRight:'10px'}}/>}
+                        title={<a onClick={() => setCategory(category!)}>{category}</a>}
+                      />
+                    </List.Item> 
+                  )   
+                }
             </List>
-        </Card>
-        </Container>
+          </Col>
+          <Col span={20}>
+            <Title>{category}({viewData.length})</Title>
+            <Card >
+                <List
+                    itemLayout="vertical"
+                    size="large"
+                    pagination={{
+                        onChange: (page) => {
+                            console.log(page);
+                        },
+                        align: 'center', 
+                        pageSize: 10,
+                    }}
+                    dataSource = {viewData}
+                    renderItem={(item) => (
+                        <List.Item
+                            key={item.title}
+                            extra={
+                              <GatsbyImage image={getImage(item.thumbnail!)!} alt='test'/>
+                            }
+                            style={{cursor: 'pointer'}}
+                            onClick={() => navigate(item.href)}
+                            onMouseOver={() => setHover(item.title as string)}
+                            onMouseLeave={() => setHover('')}
+                        >
+                            <Text style={{color:'#eb2f96'}}>{item.category}</Text>
+                            <List.Item.Meta
+                              title={<Title level={3}>{item.title}</Title>}
+                              description={
+                                <Text type="secondary" underline={hover === item.title}>{item.description}</Text>
+                              }
+                              style={{margin: '30px 0'}}
+                            />
+                            <Text type="secondary">{item.date}</Text>
+                        </List.Item>
+                        )}
+                >
+                </List>
+            </Card>
+          </Col>
+        </Row>
     </ILayout>
   )
 }
@@ -103,4 +118,4 @@ export const query = graphql`
     }
    }
 `
-export const Head: HeadFC = () => <title>Home Page</title>
+export const Head: HeadFC = () => <Seo title="ha0peno | blog"/>

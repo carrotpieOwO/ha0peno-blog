@@ -1,11 +1,12 @@
 import * as React from "react"
-import { graphql, HeadFC, PageProps } from "gatsby"
-import { navigate } from "gatsby";
-import ILayout from "../components/ILayout"
+import { graphql, HeadFC, PageProps, navigate } from "gatsby"
 import { Card, Space, Skeleton } from 'antd';
 import { GatsbyImage, getImage } from "gatsby-plugin-image";
 import { motion, useScroll, useAnimation } from "framer-motion";
 import styled from "styled-components";
+import ILayout from "../components/ILayout"
+import Seo from "../components/SEO";
+import defaultImage from '../images/defaultImage.png';
 
 const { Meta } = Card;
 const Container = styled.div`
@@ -36,7 +37,7 @@ export default function IndexPage({data}: PageProps<Queries.BlogsQuery>) {
                   alt='test' 
                   style={{height:'270px'}}/>
                 :
-                <Skeleton.Image style={{display:'flex'}}/>
+                <img src={defaultImage} alt="defaultImage"  style={{height:'270px'}}/>
               }
             >
               <div style={{marginBottom: '1em'}}>{blog.frontmatter?.category}</div>
@@ -71,4 +72,4 @@ export const query = graphql`
     }
    }
 `
-export const Head: HeadFC = () => <title>Home Page</title>
+export const Head: HeadFC = () => <Seo title="ha0peno | home"/>
