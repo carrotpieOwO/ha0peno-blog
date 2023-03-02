@@ -5,7 +5,7 @@ import { GatsbyImage, getImage } from "gatsby-plugin-image";
 import { motion, useScroll, useAnimation } from "framer-motion";
 import styled from "styled-components";
 import ILayout from "../components/ILayout"
-import Seo from "../components/SEO";
+import Seo from "../components/Seo";
 import defaultImage from '../images/defaultImage.png';
 
 const { Meta } = Card;

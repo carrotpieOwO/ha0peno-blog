@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import ILayout from "../../components/ILayout";
 import MDXLayout from "../../components/MDXLayout";
 import { LeftCircleTwoTone, RightCircleTwoTone } from "@ant-design/icons";
-import Seo from "../../components/SEO";
+import Seo from "../../components/Seo";
 const { Title, Text } = Typography;
 
 

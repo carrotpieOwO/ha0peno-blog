@@ -4,7 +4,7 @@ import ILayout from "../../components/ILayout"
 import { Card, List, Row, Col, Typography } from 'antd';
 import { GatsbyImage, getImage } from "gatsby-plugin-image";
 import styled from "styled-components";
-import Seo from "../../components/SEO";
+import Seo from "../../components/Seo";
 import { FolderTwoTone } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
