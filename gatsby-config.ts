@@ -1,4 +1,5 @@
 import type { GatsbyConfig } from "gatsby"
+require("dotenv").config({ path: `.env` });
 
 const config: GatsbyConfig = {
   siteMetadata: {
@@ -29,6 +30,16 @@ const config: GatsbyConfig = {
       options: {
         icon: 'src/images/favicon.png',
       },
+    },
+    {
+      resolve: 'gatsby-plugin-google-gtag',
+      options: {
+        trackingIds: [process.env.GATSBY_TRACKING_ID],
+        pluginconfig: {
+          head: true,
+          respectDNT: true,
+        }
+      }
     },
   ],
 }
