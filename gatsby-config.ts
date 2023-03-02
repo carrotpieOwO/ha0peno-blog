@@ -17,7 +17,7 @@ const config: GatsbyConfig = {
     `gatsby-transformer-sharp`,
     'gatsby-plugin-mdx',
     'gatsby-plugin-react-helmet',
-    'gatsby-plugin-sass',
+    `gatsby-plugin-sitemap`,
     {
       resolve: `gatsby-source-filesystem`,
       options: {
