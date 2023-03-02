@@ -8,7 +8,7 @@ import dayticon from '../images/dayticon.png';
 import nightticon from '../images/nightticon.png';
 import { git } from '../utils/paths'
 import Search from "./Search";
-import ThemeSwitch from "./themeSwich";
+import ThemeSwitch from "./ThemeSwich";
 
 const GlobalStyle = createGlobalStyle`
    * {
