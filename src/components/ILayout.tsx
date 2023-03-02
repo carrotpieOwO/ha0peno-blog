@@ -9,6 +9,7 @@ import nightticon from '../images/nightticon.png';
 import { git } from '../utils/paths'
 import Search from "./Search";
 import ThemeSwitch from "./ThemeSwich";
+import { Helmet } from 'react-helmet';
 
 const GlobalStyle = createGlobalStyle`
    * {
@@ -106,6 +107,7 @@ export default function ILayout({children} :LayoutProps) {
 
     return (
         <ConfigProvider theme={themeConfig}>
+            
             <GlobalStyle/>
             <Layout>
                 <Nav animate={navAnimation}>
