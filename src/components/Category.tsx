@@ -12,7 +12,7 @@ export default function Category({categories, setCategory} :CategoryProps) {
         <List>
             {
                 categories.map(category => 
-                <List.Item style={{borderBlockEnd:'none'}}>
+                <List.Item style={{borderBlockEnd:'none'}} key={category}>
                     <List.Item.Meta
                     avatar={<FolderTwoTone twoToneColor="#eb2f96" style={{marginRight:'10px'}}/>}
                     title={<a onClick={() => setCategory(category)}>{category}</a>}

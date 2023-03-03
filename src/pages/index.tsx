@@ -36,6 +36,8 @@ export default function IndexPage({data}: PageProps<Queries.BlogsQuery>) {
   const [ category, setCategory ] = useState('all');
   const [ viewData, setViewData ] = useState([...blogData]);
   const [ mode, setMode ] = useState<'gallery' | 'list'>('gallery')
+  const [ search, setSearch ] = useState('');
+  const [ categoryNm, setCategoryNm ] = useState(category);
 
   useEffect(() => {
     if(category !== 'all') {
@@ -47,6 +49,16 @@ export default function IndexPage({data}: PageProps<Queries.BlogsQuery>) {
 
   }, [category])
 
+  useEffect(() => {
+    if (search !== '' ) {
+      const filter = blogData.filter(blog => blog.title.toUpperCase().includes(search.toUpperCase()) || blog.description?.toUpperCase().includes(search.toUpperCase()));
+      setViewData(filter)
+    } else {
+      setViewData([...blogData])
+    }
+    
+  }, [search])
+
   return (
     <ILayout>
       
@@ -56,7 +68,7 @@ export default function IndexPage({data}: PageProps<Queries.BlogsQuery>) {
         </Col>
         <Col xs={24} md={20}>
         <Row justify="end" align='middle' gutter={20} style={{marginBottom: '20px'}}>
-          <Search/>
+          <Search search={search} setSearch={setSearch}/>
         <Col>
           <Radio.Group size="large" value={mode} onChange={(e) => setMode(e.target.value)}>
             <Radio.Button value="gallery"><AppstoreTwoTone twoToneColor="#eb2f96"/></Radio.Button>
