@@ -1,16 +1,16 @@
 import { graphql, navigate } from "gatsby";
 import React, { FunctionComponent, useEffect, useState } from "react";
-import { Anchor, Card, Col, Divider, Row, Typography, Tag, Tooltip } from 'antd';
+import { Anchor, Card, Divider, Row, Typography, Tag, Tooltip } from 'antd';
 import styled from "styled-components";
-import { motion, useScroll, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll } from "framer-motion";
 import ILayout from "../components/ILayout";
 import MDXLayout from "../components/MDXLayout";
+import Comment from "../components/Comment";
 import { LeftCircleTwoTone, RightCircleTwoTone } from "@ant-design/icons";
 import Seo from "../components/Seo";
 import { AnchorDefaultProps } from "antd/es/anchor/Anchor";
 import dayticon from '../images/dayticon.png';
 import nightticon from '../images/nightticon.png';
-import { theme } from "antd";
 
 const { Title, Text } = Typography;
 
@@ -36,7 +36,6 @@ const IFloatButton = styled(motion.div)`
     overflow: hidden;
     cursor: pointer;
 `
-
 const HomeIcon = styled(motion.div)`
     position: absolute;
     bottom: 0;
@@ -46,36 +45,19 @@ const HomeIcon = styled(motion.div)`
     background-size: cover;
 `
 
-// antd anchor 컴포넌트 extends
-interface AnchorDefaultProps {
-    position: 'static' | 'relative' | 'absolute' | 'sticky' | 'fixed',
-    top: number
-}
-const IAnchor: FunctionComponent<AnchorDefaultProps> = (props) => {
-    return (
-        <Anchor
-            style={{position: props.position, top: `${props.top}%`, right: '10%'}}
-            {...props}
-        />
-    )
-}
 interface IBlogPostProps {
     data: Queries.BlogDetailQuery;
     children: any;   
 }
 
-export default function Detail({data, children}:IBlogPostProps) {
-    console.log('theme', theme)
+export default function Detail({data, children}:IBlogPostProps) {    
     const { scrollY } = useScroll();
-    const [ anchorPostion, setAnchorPosition ] = useState<AnchorDefaultProps>({position: 'absolute', top: 35});
     const [ floatBtn, setFloatBtn ] = useState(false);
     useEffect(() => {
         scrollY.on('change', () => {
             if (scrollY.get() > 300) {
-                setAnchorPosition({position:'fixed', top: 10})
                 setFloatBtn(true)
             } else {
-                setAnchorPosition({position: 'absolute', top: 35})
                 setFloatBtn(false);
             }
         })
@@ -101,7 +83,7 @@ export default function Detail({data, children}:IBlogPostProps) {
     return (
         <ILayout>
             <Row>
-                <ContentCard>
+                <ContentCard actions = {[<Comment/>]}>
                     <Tag color="magenta" style={{marginBottom: '20px'}}>{frontMatter?.category}</Tag>
                     <Title>{frontMatter?.title}</Title>
                     <div style={{display: 'flex', justifyContent: 'space-between'}}>
@@ -113,7 +95,7 @@ export default function Detail({data, children}:IBlogPostProps) {
                 </ContentCard>
                 {
                     headings &&
-                    <IAnchor items={headings} targetOffset={300} position={anchorPostion.position} top={anchorPostion.top}/>
+                    <Anchor style={{marginTop: '200px'}} items={headings} targetOffset={300} />
                 }
             </Row>
             <Row style={{padding: '5em 0', width: '70%', marginLeft:'auto', marginRight:'auto'}}>
@@ -145,24 +127,21 @@ export default function Detail({data, children}:IBlogPostProps) {
                             </motion.div>
                         </NaviCard>
                 }
-                  <AnimatePresence>
-                    
-                {
-                    floatBtn &&
-                    <Tooltip title="go home🤍" color='pink'>
-                        <IFloatButton
-                            initial={{opacity:0}}
-                            animate={{opacity:1, transition: {duration: .5}}}
-                            exit = {{opacity:0,  transition: {duration: .5}}}
-                            onClick={() => navigate('/')}
-                        >
-                            <HomeIcon whileHover={{scale:1.2, transition: {duration: .5}}} />
-                        </IFloatButton>
-                   </Tooltip>
-                }
-                     </AnimatePresence>
-
-
+                <AnimatePresence>
+                    {
+                        floatBtn &&
+                        <Tooltip title="go home🤍" color='pink'>
+                            <IFloatButton
+                                initial={{opacity:0}}
+                                animate={{opacity:1, transition: {duration: .5}}}
+                                exit = {{opacity:0,  transition: {duration: .5}}}
+                                onClick={() => navigate('/')}
+                            >
+                                <HomeIcon whileHover={{scale:1.2, transition: {duration: .5}}} />
+                            </IFloatButton>
+                    </Tooltip>
+                    }
+                </AnimatePresence>
             </Row>
         </ILayout>
     )

@@ -1,5 +1,5 @@
 import { navigate } from "gatsby";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { ConfigProvider, Layout, theme, Row, Button } from 'antd';
 import styled, { ThemeProvider } from "styled-components";
 import { motion, useScroll, useAnimation } from "framer-motion";
@@ -7,6 +7,7 @@ import { createGlobalStyle } from "styled-components"
 import dayticon from '../images/dayticon.png';
 import nightticon from '../images/nightticon.png';
 import ThemeSwitch from "./ThemeSwich";
+import useTheme from "../hooks/useTheme";
 
 
 const GlobalStyle = createGlobalStyle`
@@ -76,25 +77,15 @@ interface LayoutProps {
 
 export type ThemeType = 'light' | 'dark';
 
-const isBrowser = () => typeof window !== "undefined"
-
 export default function ILayout({children} :LayoutProps) {
-    const initialTheme = isBrowser() && window.localStorage.getItem('theme') as ThemeType;
-    const [ themeMode, setThemeMode ] = useState<ThemeType>(initialTheme);
     const { scrollY } = useScroll();
     const navAnimation = useAnimation();
+
+    const { themeMode, themeToggler } = useTheme();
+
     const themeConfig = {
         algorithm: themeMode === 'light' ? theme.defaultAlgorithm : theme.darkAlgorithm,
         token: {colorPrimary: '#eb2f96', colorLinkHover: '#ffd6e7' }
-    }
-
-    const setTheme = (mode:ThemeType) => {
-        isBrowser() && window.localStorage.setItem('theme', mode as ThemeType);
-        setThemeMode(mode)
-    }
-
-    const themeToggle = () => {
-        themeMode === 'light' ? setTheme('dark') : setTheme('light');
     }
 
     useEffect(() => {
@@ -118,7 +109,7 @@ export default function ILayout({children} :LayoutProps) {
             <GlobalStyle/>
             <Layout>
                 <Nav animate = {navAnimation}>
-                    <ThemeSwitch themeMode={themeMode} themeToggle={themeToggle}/>
+                    <ThemeSwitch themeMode={themeMode} themeToggle={themeToggler}/>
                     <GitBtn 
                         href="https://github.com/carrotpieOwO" 
                         target="_blank"
