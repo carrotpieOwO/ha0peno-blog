@@ -55,33 +55,36 @@ export default function IndexPage({data}: PageProps<Queries.BlogsQuery>) {
   const [ search, setSearch ] = useState('');
 
   useEffect(() => {
-    if(currentCategory !== 'all') {
-        const filter = blogData.filter(blog => blog.category === currentCategory);
-        setViewData(filter);
-    } else {
-        setViewData([...blogData])
-    }
-
-  }, [currentCategory])
-
-  useEffect(() => {
     if (search !== '' ) {
-      const filter = blogData.filter(
+      const filterData = blogData.filter(
         blog => blog.title.toUpperCase().includes(search.toUpperCase()) 
         || blog.description?.toUpperCase().includes(search.toUpperCase())
       );
       // 검색결과에 해당하는 카테고리리스트만 보여주기
-      setCategoryList(createCategory(filter))
-      // 검색결과 리스트 반영
-      setViewData(filter)
+      setCategoryList(createCategory(filterData))
+
+      // 카테고리가 선택될 경우 해당 카테고리만 보여주기
+      if(currentCategory !== 'all') {
+        const filter = filterData.filter(blog => blog.category === currentCategory);
+        setViewData(filter);
+      } else {
+        setViewData([...filterData])
+      }
+      
     } else {
-      // search값이 빈값일 경우 모든 데이터 보여주기
-      setViewData([...blogData])
+      // search가 빈값일 경우 모든 카테고리 보여주기
       setCategoryList(createCategory(blogData))
-      setCurrentCategory('all')
+
+      if(currentCategory !== 'all') {
+        // 카테고리가 선택될 경우 해당 카테고리만 보여주기
+        const filter = blogData.filter(blog => blog.category === currentCategory);
+        setViewData(filter);
+      } else {
+        setViewData([...blogData])
+      }
     }
     
-  }, [search])
+  }, [search, currentCategory])
 
   return (
     <ILayout>
