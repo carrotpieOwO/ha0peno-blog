@@ -71,6 +71,16 @@ const IFooter = styled(Footer)`
     display: flex;
     justify-content: space-between;
 `
+const footerVariants = {
+    animate: {
+        rotate: [-15, 15], 
+        transition: {
+            repeat: Infinity, 
+            repeatType: "reverse", 
+            duration: 1
+        }
+    }
+}
 interface LayoutProps {
     children: any;
 }
@@ -137,8 +147,17 @@ export default function ILayout({children} :LayoutProps) {
                         <a href="https://github.com/carrotpieOwO" target="_blank">gitHub</a>
                         <a href="https://ha0peno.vercel.app" target="_blank">portfolio</a>
                     </div>
-                    © 2023 ha0peno 👋 Thanks for visiting!
-                    <div></div>
+                    <div style={{display: 'flex', gap: '5px', alignItems:'center'}}>
+                        © 2023 ha0peno 
+                        <motion.div 
+                            style={{fontSize: '20px'}}
+                            variants={footerVariants}
+                            animate="animate">
+                                👋🏻
+                        </motion.div> 
+                        Thanks for visiting!
+                    </div>
+                    🔮 Built with Gatsby
                 </IFooter>
             </Layout>
         </ConfigProvider>
