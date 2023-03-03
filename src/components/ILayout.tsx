@@ -76,8 +76,10 @@ interface LayoutProps {
 
 export type ThemeType = 'light' | 'dark';
 
+const isBrowser = () => typeof window !== "undefined"
+
 export default function ILayout({children} :LayoutProps) {
-    const initialTheme = localStorage.getItem('theme') as ThemeType;
+    const initialTheme = isBrowser() && window.localStorage.getItem('theme') as ThemeType;
     const [ themeMode, setThemeMode ] = useState<ThemeType>(initialTheme);
     const { scrollY } = useScroll();
     const navAnimation = useAnimation();
@@ -87,7 +89,7 @@ export default function ILayout({children} :LayoutProps) {
     }
 
     const setTheme = (mode:ThemeType) => {
-        localStorage.setItem('theme', mode as ThemeType);
+        isBrowser() && window.localStorage.setItem('theme', mode as ThemeType);
         setThemeMode(mode)
     }
 
