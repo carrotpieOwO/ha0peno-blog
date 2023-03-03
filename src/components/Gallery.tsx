@@ -29,7 +29,7 @@ export default function Gallery(props: {viewData:BlogType}) {
                 <List.Item>
                      <ICard 
                         key={blog.href}
-                        whileHover={{ scale: 1.1 }}
+                        whileHover={{ scale: 1.05 }}
                         onClick={() => navigate(`${blog.href}`)}
                         cover={
                             blog.thumbnail ?
