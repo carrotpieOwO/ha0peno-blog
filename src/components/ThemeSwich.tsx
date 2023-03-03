@@ -2,21 +2,26 @@ import React from "react";
 import styled from "styled-components";
 import { motion, AnimatePresence } from "framer-motion";
 import { moon, sun } from '../utils/paths'
+import { ThemeType } from "./ILayout";
 
 const MoonPath = styled(motion.path)``
 const SunPath = styled(motion.path)``
 
 interface ThemeSwitchProps {
-    themeMode: boolean,
-    setThemeMode: (b:boolean) => void
+    themeMode: ThemeType,
+    themeToggle: () => void
 }
 
-export default function ThemeSwitch({themeMode, setThemeMode}: ThemeSwitchProps) {
+export default function ThemeSwitch({themeMode, themeToggle}: ThemeSwitchProps) {
     return (
-    <svg width={25} height={25} viewBox="0 0 496 512" onClick={() => setThemeMode(!themeMode)} style={{cursor:'pointer'}}>
+    <motion.svg width={25} height={25} viewBox="0 0 496 512" 
+        onClick={() => themeToggle()} 
+        style={{cursor:'pointer'}}
+        whileHover={{scale: 1.2}}
+    >
             <AnimatePresence>
                 {
-                    themeMode ? 
+                    themeMode === 'light' ? 
                     <MoonPath 
                         initial={{ opacity: .5 }}
                         animate={{ opacity: 1, rotate: [ 30, 0 ], transition: {duration: 1}}}
@@ -33,6 +38,6 @@ export default function ThemeSwitch({themeMode, setThemeMode}: ThemeSwitchProps)
                         d={sun}/>
                 }
             </AnimatePresence>
-        </svg>
+        </motion.svg>
     )
 }

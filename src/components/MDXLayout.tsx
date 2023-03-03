@@ -6,7 +6,7 @@ import { MDXProvider } from "@mdx-js/react";
 import { Divider, Typography, Card } from 'antd';
 import styled from "styled-components";
 
-const { Title, Paragraph, Text, Link } = Typography;
+const { Title, Paragraph, Text } = Typography;
 
 const Circle = styled.div`
     width: 20px;
@@ -65,12 +65,11 @@ interface HeadingProps {
 
 // 목차생성을 위한 id 부여
 const Heading = ({ children, level }: HeadingProps) => {
+    console.log('chil', children)
     return (
         <Title id={children.replace(/\W/g,'-')} level={level}>{children}</Title>
     )
 }
-
-  
 
 export default function MDXLayout({children} :any) {
     return (
@@ -83,10 +82,13 @@ export default function MDXLayout({children} :any) {
                 h5: (props:any) => <Title level={5} {...props}></Title>,
                 h6: (props:any) => <Title level={6} {...props}></Title>,
                 hr: (props:any) => <Divider/>,
-                blockquote: (props:any) => <Paragraph><blockquote {...props}></blockquote></Paragraph>,
+                blockquote: (props:any) => <Paragraph style={{fontSize: '20px'}}><blockquote {...props}></blockquote></Paragraph>,
                 ul: (props:any) => <Paragraph><ul {...props}></ul></Paragraph>,
-                code: (props:any) => <Text code {...props}></Text>,
-                pre:  (props:any) => CodeBlock(props)
+                li: (props:any) => <Paragraph><li {...props}></li></Paragraph>,
+                code: (props:any) => <Paragraph><Text code {...props}></Text></Paragraph>,
+                pre:  (props:any) => CodeBlock(props),
+                img: (props:any) => <img width='100%' style={{margin: '10px 0'}} {...props}/>,
+                p: (props:any) => <Paragraph><Text {...props}/></Paragraph>
             }}
         >
             {children}

@@ -1,15 +1,13 @@
-import { Link } from "gatsby";
+import { navigate } from "gatsby";
 import React, { useEffect, useState } from "react";
-import { ConfigProvider, Layout, theme } from 'antd';
-import styled from "styled-components";
+import { ConfigProvider, Layout, theme, Row, Button } from 'antd';
+import styled, { ThemeProvider } from "styled-components";
 import { motion, useScroll, useAnimation } from "framer-motion";
 import { createGlobalStyle } from "styled-components"
 import dayticon from '../images/dayticon.png';
 import nightticon from '../images/nightticon.png';
-import { git } from '../utils/paths'
-import Search from "./Search";
 import ThemeSwitch from "./ThemeSwich";
-import { Helmet } from 'react-helmet';
+
 
 const GlobalStyle = createGlobalStyle`
    * {
@@ -34,19 +32,23 @@ const { Content, Footer } = Layout;
 
 const Nav = styled(motion.nav)`
     display: flex;
-    justify-content: space-between;
+    justify-content: end;
     align-items: center;
     position: fixed;
     width: 100vw;
-    padding: 20px calc(100vw / 10);
-    color: #fff;
+    height: 60px;
+    padding-right: 30px;
+    gap: 15px;
     z-index: 99;
 `
+const GitBtn = styled(motion.a)`
+    border-radius: 15px;
+    padding: 8px 20px;
+    border: 1px solid black;
+    color: #000;
+`
 const Cover = styled(motion.div)`
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    height: 300px;
+    height: 250px;
     width: 100vw;
     display: flex;
     justify-content: center;
@@ -56,18 +58,13 @@ const Cover = styled(motion.div)`
     color: #fff;
     position: relative;
     border-bottom: 1px solid black;
+    overflow: hidden;
 `
-const MenuWrap = styled.div`
-    display: flex;
-    gap: 30px;
-    align-items: center;
-    font-weight: 700;
-    font-size: 16px;
-    color: #2c2828;
-`
-const ILink = styled(Link)`
-    color: #2c2828;
-    text-decoration: none;
+const HomeImg = styled(motion.img)`
+    position: absolute;
+    bottom: 0;
+    width: 250px;
+    cursor: pointer;
 `
 const IFooter = styled(Footer)`
     display: flex;
@@ -77,29 +74,38 @@ interface LayoutProps {
     children: any;
 }
 
-const themeCode = { day: true, night: false }
+export type ThemeType = 'light' | 'dark';
 
 export default function ILayout({children} :LayoutProps) {
-    const [ themeMode, setThemeMode ] = useState(themeCode.day);
+    const initialTheme = localStorage.getItem('theme') as ThemeType;
+    const [ themeMode, setThemeMode ] = useState<ThemeType>(initialTheme);
     const { scrollY } = useScroll();
     const navAnimation = useAnimation();
     const themeConfig = {
-        algorithm: themeMode ? theme.defaultAlgorithm : theme.darkAlgorithm,
+        algorithm: themeMode === 'light' ? theme.defaultAlgorithm : theme.darkAlgorithm,
         token: {colorPrimary: '#eb2f96', colorLinkHover: '#ffd6e7' }
+    }
+
+    const setTheme = (mode:ThemeType) => {
+        localStorage.setItem('theme', mode as ThemeType);
+        setThemeMode(mode)
+    }
+
+    const themeToggle = () => {
+        themeMode === 'light' ? setTheme('dark') : setTheme('light');
     }
 
     useEffect(() => {
         scrollY.on('change', () => {
             if(scrollY.get() > 225) {
                 navAnimation.start({
-                    backgroundColor: 'rgba(245, 102, 135, 1)',
-                    borderBottom: '1px solid black',
+                    backgroundColor: 'rgba(255, 255, 255, .5)',
+                    boxShadow: '0 2px 4px 0 rgba(0,0,0,.2)'
                 })
             } else{
                 navAnimation.start({
                     backgroundColor: 'rgba(255, 255, 255, 0)',
-                    borderBottom: 'none'
-                    
+                    boxShadow: 'none'
                 })
             }
         })
@@ -107,31 +113,32 @@ export default function ILayout({children} :LayoutProps) {
 
     return (
         <ConfigProvider theme={themeConfig}>
-            
             <GlobalStyle/>
             <Layout>
-                <Nav animate={navAnimation}>
-                    <MenuWrap>
-                        <ILink to="/">Home</ILink>
-                        <ILink to="/blog">Blog</ILink>
-                    </MenuWrap>
-                    <MenuWrap>
-                        <Search/>
-                        <ThemeSwitch themeMode={themeMode} setThemeMode={setThemeMode}/>
-                        <a href="https://github.com/carrotpieOwO" target="_blank">
-                            <svg width={25} height={25} viewBox="0 0 496 512">
-                                <path d={git}/>
-                            </svg>
-                        </a>
-                    </MenuWrap>
+                <Nav animate = {navAnimation}>
+                    <ThemeSwitch themeMode={themeMode} themeToggle={themeToggle}/>
+                    <GitBtn 
+                        href="https://github.com/carrotpieOwO" 
+                        target="_blank"
+                        whileHover={{backgroundColor: 'rgb(255, 255, 255)', color: '#000',}}
+                    >
+                        Git
+                    </GitBtn>
                 </Nav>
-                <Cover animate={{backgroundColor: themeMode ? 'rgb(245, 102, 135)' : 'rgb(91, 94, 118)'}}>
+                <Cover animate={{backgroundColor: themeMode === 'light' ? 'rgb(245, 102, 135)' : 'rgb(91, 94, 118)'}}>
                     ha0peno
-                    <img src={themeMode ? dayticon : nightticon} width="250" alt="ha0peno" style={{position: 'absolute', bottom: 0}}/>
+                    <HomeImg
+                        src={themeMode === 'light' ? dayticon : nightticon} 
+                        alt="ha0peno" 
+                        whileHover={{scale: 1.2}}
+                        onClick={() => navigate('/')}
+                    />
                 </Cover>
-                <Content style={{ padding: '5% 10%', minHeight: '100vh'}}>
-                    {children}
-                </Content>
+                <ThemeProvider theme={{themeMode}}>
+                    <Content style={{ padding: '5% 10%', minHeight: '100vh'}}>
+                        {children}
+                    </Content>
+                </ThemeProvider>
                 <IFooter>
                     <div style={{display: 'flex', gap: '20px'}}>
                         <a href="https://github.com/carrotpieOwO" target="_blank">gitHub</a>
