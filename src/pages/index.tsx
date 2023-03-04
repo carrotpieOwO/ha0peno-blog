@@ -7,6 +7,10 @@ import Seo from "../components/Seo";
 import Gallery from "../components/Gallery";
 import BList from "../components/BList";
 import Search from "../components/Search";
+import { Location } from '@reach/router'
+import queryString from 'query-string'
+import withLocation from "../components/withLocation";
+import PropTypes from "prop-types"
 
 export type BlogType = {
   title: string | null | undefined;
@@ -38,7 +42,7 @@ function createCategory (data: BlogType) {
   return sort
 }
 
-export default function IndexPage({data}: PageProps<Queries.BlogsQuery>) {
+function IndexPage({data, search}: PageProps<Queries.BlogsQuery> | any) {
   const blogData:BlogType = Array.from(data.allMdx.nodes).map(blog => ({
     title: blog.frontmatter?.title,
     thumbnail: blog.frontmatter?.thumbnail?.childImageSharp?.gatsbyImageData,
@@ -48,17 +52,21 @@ export default function IndexPage({data}: PageProps<Queries.BlogsQuery>) {
     category: blog.frontmatter?.category
   }))
 
-  const [ categoryList, setCategoryList ] = useState(createCategory(blogData));
-  const [ currentCategory, setCurrentCategory ] = useState('all');
+
+  const categories = createCategory(blogData);
+  const queryStr = Object.keys(categories).includes(search.category) ? search.category : 'all';
+
+  const [ categoryList, setCategoryList ] = useState(categories);
+  const [ currentCategory, setCurrentCategory ] = useState(queryStr);
   const [ viewData, setViewData ] = useState([...blogData]);
   const [ mode, setMode ] = useState<'gallery' | 'list'>('gallery')
-  const [ search, setSearch ] = useState('');
+  const [ searchTxt, setSearchTxt ] = useState('');
 
   useEffect(() => {
-    if (search !== '' ) {
+    if (searchTxt !== '' ) {
       const filterData = blogData.filter(
-        blog => blog.title.toUpperCase().includes(search.toUpperCase()) 
-        || blog.description?.toUpperCase().includes(search.toUpperCase())
+        blog => blog.title.toUpperCase().includes(searchTxt.toUpperCase()) 
+        || blog.description?.toUpperCase().includes(searchTxt.toUpperCase())
       );
       // 검색결과에 해당하는 카테고리리스트만 보여주기
       setCategoryList(createCategory(filterData))
@@ -66,13 +74,17 @@ export default function IndexPage({data}: PageProps<Queries.BlogsQuery>) {
       // 카테고리가 선택될 경우 해당 카테고리만 보여주기
       if(currentCategory !== 'all') {
         const filter = filterData.filter(blog => blog.category === currentCategory);
+        // 선택된 카테고리에 데이터가 없으면 전체카테고리 보여주기
+        if(filter.length === 0) {
+          setCurrentCategory('all')
+        } 
         setViewData(filter);
       } else {
         setViewData([...filterData])
       }
       
     } else {
-      // search가 빈값일 경우 모든 카테고리 보여주기
+      // searchTxt가 빈값일 경우 모든 카테고리 보여주기
       setCategoryList(createCategory(blogData))
 
       if(currentCategory !== 'all') {
@@ -84,7 +96,7 @@ export default function IndexPage({data}: PageProps<Queries.BlogsQuery>) {
       }
     }
     
-  }, [search, currentCategory])
+  }, [searchTxt, currentCategory])
 
   return (
     <ILayout>
@@ -103,7 +115,7 @@ export default function IndexPage({data}: PageProps<Queries.BlogsQuery>) {
       }
       </Row>
       <Row justify="end" align='middle' gutter={20} style={{margin: '20px 0', gap: '10px'}}>
-        <Search search={search} setSearch={setSearch}/>
+      <Search search={searchTxt} setSearch={setSearchTxt}/>
         <Radio.Group size="large" value={mode} onChange={(e) => setMode(e.target.value)}>
           <Radio.Button value="gallery"><AppstoreTwoTone twoToneColor="#eb2f96"/></Radio.Button>
           <Radio.Button value="list"><ProfileTwoTone twoToneColor="#eb2f96"/></Radio.Button>
@@ -118,6 +130,11 @@ export default function IndexPage({data}: PageProps<Queries.BlogsQuery>) {
     </ILayout>
   )
 }
+
+IndexPage.propTypes = {
+  search: PropTypes.object,
+}
+export default withLocation(IndexPage)
 
 export const query = graphql`
    query Blogs {

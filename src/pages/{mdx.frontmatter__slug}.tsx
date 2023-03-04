@@ -1,5 +1,5 @@
 import { graphql, navigate } from "gatsby";
-import React, { FunctionComponent, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Anchor, Card, Divider, Row, Typography, Tag, Tooltip } from 'antd';
 import styled from "styled-components";
 import { motion, AnimatePresence, useScroll } from "framer-motion";
@@ -8,7 +8,6 @@ import MDXLayout from "../components/MDXLayout";
 import Comment from "../components/Comment";
 import { LeftCircleTwoTone, RightCircleTwoTone } from "@ant-design/icons";
 import Seo from "../components/Seo";
-import { AnchorDefaultProps } from "antd/es/anchor/Anchor";
 import dayticon from '../images/dayticon.png';
 import nightticon from '../images/nightticon.png';
 
@@ -43,6 +42,10 @@ const HomeIcon = styled(motion.div)`
     height: 70px;
     background-image: ${(props) => props.theme.themeMode === 'light' ? `url(${dayticon})` : `url(${nightticon})`};
     background-size: cover;
+`
+const ITag = styled(Tag)`
+    margin-bottom: 20px;
+    cursor: pointer;
 `
 
 interface IBlogPostProps {
@@ -84,7 +87,11 @@ export default function Detail({data, children}:IBlogPostProps) {
         <ILayout>
             <Row>
                 <ContentCard actions = {[<Comment/>]}>
-                    <Tag color="magenta" style={{marginBottom: '20px'}}>{frontMatter?.category}</Tag>
+                    <ITag color="magenta"
+                        onClick={()=> navigate(`/?category=${frontMatter?.category}`)}
+                    >
+                        {frontMatter?.category}
+                    </ITag>
                     <Title>{frontMatter?.title}</Title>
                     <div style={{display: 'flex', justifyContent: 'space-between'}}>
                         <Text type="secondary">{frontMatter?.date}</Text>
