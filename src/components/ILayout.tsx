@@ -138,7 +138,7 @@ export default function ILayout({children} :LayoutProps) {
                     />
                 </Cover>
                 <ThemeProvider theme={{themeMode}}>
-                    <Content style={{ padding: '5% 10%', minHeight: '100vh'}}>
+                    <Content style={{ minHeight: '100vh'}}>
                         {children}
                     </Content>
                 </ThemeProvider>

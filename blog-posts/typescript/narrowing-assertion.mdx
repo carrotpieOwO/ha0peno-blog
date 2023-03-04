@@ -1,0 +1,94 @@
+---
+title: Narrowing & Assertion
+category: type
+date: '2022-12-30'
+author: ha0peno
+slug: ts-narrowing-assortion
+thumbnail: ts.png
+---
+
+
+
+# 1. Narrowing
+> 타입스크립트에서 애매한 타입을 다룰 때 타입을 하나로 정해주는 것을 뜻한다. <br/>
+(일종의 코딩 방식 중 하나)
+
+typescript는 타입을 엄격히 다루기 때문에, 아래와 같은 함수는 에러를 발생시킨다. <br/>
+이유는 x라는 파라미터는 union타입이기 때문에 연산할 수 없기 때문.
+![](https://velog.velcdn.com/images/ha0/post/4d454330-a170-47cb-956e-c4f460c1aab2/image.png)
+
+👉🏻 __union type 등 때문에 어떤 변수 타입이 아직 불확실하다면 if문 등으로 Narrowing(타입확정)해줘야 조작가능하다.__
+![](https://velog.velcdn.com/images/ha0/post/dcb98e61-b4c6-4303-89f8-7e288c8ecdf2/image.png)
+- if문은 끝까지 써야 안전하다.
+<br/>
+
+## ⭐️ Narrowing으로 판정해주는 문법들
+- `typeof 변수`, `속성명 in 오브젝트자료`, `인스턴스 instanceof 부모`
+```ts
+	type Fish = {swim :string}
+	type Bird = {fly :string}
+    
+	// ** 오브젝트 자료 배타속성으로 찾기
+	function 함수(animal :Fish | Bird) {
+    	if ( 'swim' in animal) {
+        	// (Fish에만 있는)swim이라는 속성이 animal에 있는지 체크
+        	animal.swim
+    	}
+	}
+```
+
+```ts
+	// **instanceof 사용 => 오브젝트 instanceof 부모class
+	class Human  { 
+    	name: string; 
+    	age: number;
+    	constructor(a :string, b :number) {
+      		this.name = a;
+       		this.age = b;
+    	}
+	}
+
+	let me = new Human('ha0', 30);
+
+	function 함수(a) {
+    	if( a instanceof Human) {
+        	a.age
+    	}
+	}
+```
+```ts
+	// ** 배타속성이 없지만 literal type을 가진 오브젝트
+    type Car = {
+    	wheel : '4개',
+    	color : string
+	}
+
+	type Bike = {
+    	wheel : '2개',
+    	color : string
+	}
+	
+    function vehicle(x :Car|Bike) {
+    	x.wheel === '4개' && console.log('x는', x)
+	}
+```
+👉🏻 __그냥 현재 변수의 타입이 뭔지 논리적으로 특정지을 수 있으면 다 인정됨__
+<br/>
+
+# 2. Assertion
+> Narrowing을 쓰기 귀찮을 때 타입을 덮어쓰는 문법
+- `변수명 as 타입`
+
+![](https://velog.velcdn.com/images/ha0/post/00645c98-2f2a-4396-ab8d-5331d77377ac/image.png)
+## 2-1. Assertion문법의 용도
+- Narrowing할 때 (타입을 확정지을 때 쓰는 용도이지 타입을 변경해주는 것이 아님)
+```tsx
+	let 이름 :string = 'ha0';
+	이름 as number; // <- 에러발생
+```
+- 무슨 타입이 들어올지 확실한 경우 사용 ~~(버그추적을 못하기 때문... 그래서 굳이 쓸모가 없음)~~
+ - 임시로 에러해결용으로 사용하거나 타입을 강제로 부여하는 함수를 만들고 싶을 때 등등......
+👉🏻 하지만 웬만하면 Narrowing하는 것이 좋다..
+
+
+

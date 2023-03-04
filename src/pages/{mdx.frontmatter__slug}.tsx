@@ -1,5 +1,5 @@
 import { graphql, navigate } from "gatsby";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Anchor, Card, Divider, Row, Typography, Tag, Tooltip } from 'antd';
 import styled from "styled-components";
 import { motion, AnimatePresence, useScroll } from "framer-motion";
@@ -13,10 +13,11 @@ import nightticon from '../images/nightticon.png';
 
 const { Title, Text } = Typography;
 
+const Container = styled.div`
+    padding: 5% 5% 5% 15%;
+`
 const ContentCard = styled(Card)`
-    margin-left: auto;
-    margin-right: auto;
-    width: 70%;
+    width: 80%;
     padding: 2em;
 `
 const NaviCard = styled(Card)`
@@ -52,10 +53,24 @@ interface IBlogPostProps {
     data: Queries.BlogDetailQuery;
     children: any;   
 }
+const isBrowser = () => typeof window !== "undefined"
 
 export default function Detail({data, children}:IBlogPostProps) {    
     const { scrollY } = useScroll();
     const [ floatBtn, setFloatBtn ] = useState(false);
+    const [ anchor, setAnchor ] = useState(true);
+
+    const handleResize = () => {
+        setAnchor(isBrowser() && window.innerWidth >= 1210)
+    }
+
+    useEffect(() => {
+        isBrowser() && window.addEventListener('resize', handleResize)
+        return () => {
+            isBrowser() &&  window.removeEventListener('resize', handleResize)
+        }
+    }, [])
+
     useEffect(() => {
         scrollY.on('change', () => {
             if (scrollY.get() > 300) {
@@ -85,55 +100,59 @@ export default function Detail({data, children}:IBlogPostProps) {
 
     return (
         <ILayout>
-            <Row>
-                <ContentCard actions = {[<Comment/>]}>
-                    <ITag color="magenta"
-                        onClick={()=> navigate(`/?category=${frontMatter?.category}`)}
-                    >
-                        {frontMatter?.category}
-                    </ITag>
-                    <Title>{frontMatter?.title}</Title>
-                    <div style={{display: 'flex', justifyContent: 'space-between'}}>
-                        <Text type="secondary">{frontMatter?.date}</Text>
-                        <Text type="secondary">{frontMatter?.author} 👩🏻‍💻</Text>
-                    </div>
-                    <Divider/>
-                    <MDXLayout>{children}</MDXLayout>
-                </ContentCard>
-                {
-                    headings &&
-                    <Anchor style={{marginTop: '200px'}} items={headings} targetOffset={300} />
-                }
-            </Row>
-            <Row style={{padding: '5em 0', width: '70%', marginLeft:'auto', marginRight:'auto'}}>
-                {
-                    naviData?.previous && 
-                        <NaviCard 
-                            style={{marginRight:'auto'}}
-                            onClick={() => navigate(`/${naviData.previous?.frontmatter?.slug}`)}
+            <Container>
+                <Row>
+                    <ContentCard actions = {[<Comment/>]}>
+                        <ITag color="magenta"
+                            onClick={()=> navigate(`/?category=${frontMatter?.category}`)}
                         >
-                            <motion.div
-                                whileHover={{x: [0, -10, 0], transition: {duration: .7}}}
+                            {frontMatter?.category}
+                        </ITag>
+                        <Title>{frontMatter?.title}</Title>
+                        <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                            <Text type="secondary">{frontMatter?.date}</Text>
+                            <Text type="secondary">{frontMatter?.author} 👩🏻‍💻</Text>
+                        </div>
+                        <Divider/>
+                        <MDXLayout>{children}</MDXLayout>
+                    </ContentCard>
+                    {
+                        headings && anchor &&
+                        <div style={{marginLeft: 'auto', maxWidth: '200px'}}>
+                            <Anchor style={{marginTop: '200px'}} items={headings} targetOffset={300} />
+                        </div>
+                    }
+                </Row>
+                <Row style={{padding: '3em 0', width: '80%', margin: 0}}>
+                    {
+                        naviData?.previous && 
+                            <NaviCard 
+                                style={{marginRight:'auto'}}
+                                onClick={() => navigate(`/${naviData.previous?.frontmatter?.slug}`)}
                             >
-                                <LeftCircleTwoTone twoToneColor="#eb2f96" style={{margin: '10px'}}/>
-                                <Text strong>{naviData.previous.frontmatter?.title}</Text>
-                            </motion.div>
-                        </NaviCard>
-                }
-                {
-                    naviData?.next && 
-                        <NaviCard
-                            style={{marginLeft:'auto'}}
-                            onClick={() => navigate(`/${naviData.next?.frontmatter?.slug}`)}
-                        >
-                            <motion.div style={{textAlign: 'end'}} 
-                                whileHover={{x: [0, 10, 0], transition: {duration: .7}}}
+                                <motion.div
+                                    whileHover={{x: [0, -10, 0], transition: {duration: .7}}}
+                                >
+                                    <LeftCircleTwoTone twoToneColor="#eb2f96" style={{margin: '10px'}}/>
+                                    <Text strong>{naviData.previous.frontmatter?.title}</Text>
+                                </motion.div>
+                            </NaviCard>
+                    }
+                    {
+                        naviData?.next && 
+                            <NaviCard
+                                style={{marginLeft:'auto'}}
+                                onClick={() => navigate(`/${naviData.next?.frontmatter?.slug}`)}
                             >
-                                <Text strong>{naviData.next.frontmatter?.title}</Text>
-                                <RightCircleTwoTone twoToneColor="#eb2f96" style={{margin: '10px'}}/>
-                            </motion.div>
-                        </NaviCard>
-                }
+                                <motion.div style={{textAlign: 'end'}} 
+                                    whileHover={{x: [0, 10, 0], transition: {duration: .7}}}
+                                >
+                                    <Text strong>{naviData.next.frontmatter?.title}</Text>
+                                    <RightCircleTwoTone twoToneColor="#eb2f96" style={{margin: '10px'}}/>
+                                </motion.div>
+                            </NaviCard>
+                    }
+                </Row>
                 <AnimatePresence>
                     {
                         floatBtn &&
@@ -149,7 +168,7 @@ export default function Detail({data, children}:IBlogPostProps) {
                     </Tooltip>
                     }
                 </AnimatePresence>
-            </Row>
+            </Container>
         </ILayout>
     )
 }

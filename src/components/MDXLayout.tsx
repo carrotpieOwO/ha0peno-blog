@@ -6,24 +6,37 @@ import { MDXProvider } from "@mdx-js/react";
 import { Divider, Typography, Card } from 'antd';
 import styled from "styled-components";
 
-const { Title, Paragraph, Text } = Typography;
+const { Title, Paragraph, Text, Link } = Typography;
 
+const Blockquote = styled.blockquote`
+    padding-inline: 1em !important;
+    padding-block: 1em !important;
+    border-inline-start: 5px solid pink !important;
+    background: ${props => props.theme.themeMode === 'light' ? '#faf4f4' : 'black'};
+`
 const Circle = styled.div`
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     background-color: ${props => props.color};
-    border-radius: 10px;
-`;
-
+    border-radius: 8px;
+`
 const CodeBlockHeader = () => {
     return (
-        <div style={{display: 'flex', gap: '10px'}}>
+        <div style={{display: 'flex', gap: '10px', marginBottom: '24px'}}>
             <Circle color={'#FF5F56'}/>
             <Circle color={'#FFBD2E'}/>
             <Circle color={'#27C93F'}/>
         </div>
     )
 }
+const CodeBlockContainer = styled.div`
+    margin: 1em;
+    background-color: #2c2c2c;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    padding: 24px;
+    overflow: scroll;
+`
 
 // codeblock 컴포넌트
 const CodeBlock = ({ children }:any) => {
@@ -39,9 +52,8 @@ const CodeBlock = ({ children }:any) => {
             theme={theme}
         >
             {({ className, tokens, getLineProps, getTokenProps }) => (
-                <div>
-               
-                <Card extra={<CodeBlockHeader/>} style={{background:'#1f1f1f'}}>
+                <CodeBlockContainer>
+                    <CodeBlockHeader/>
                     <pre className={className}>
                         {tokens.map((line, i) => (
                             <div {...getLineProps({ line, key: i })}>
@@ -51,8 +63,7 @@ const CodeBlock = ({ children }:any) => {
                             </div>
                         ))}
                     </pre>
-                </Card>
-                </div>
+                </CodeBlockContainer>
             )}
         </Highlight>
     );
@@ -65,7 +76,6 @@ interface HeadingProps {
 
 // 목차생성을 위한 id 부여
 const Heading = ({ children, level }: HeadingProps) => {
-    console.log('chil', children)
     return (
         <Title id={children.replace(/\W/g,'-')} level={level}>{children}</Title>
     )
@@ -82,13 +92,14 @@ export default function MDXLayout({children} :any) {
                 h5: (props:any) => <Title level={5} {...props}></Title>,
                 h6: (props:any) => <Title level={6} {...props}></Title>,
                 hr: (props:any) => <Divider/>,
-                blockquote: (props:any) => <Paragraph style={{fontSize: '20px'}}><blockquote {...props}></blockquote></Paragraph>,
+                blockquote: (props:any) => <Paragraph style={{fontSize: '20px'}}><Blockquote {...props} /></Paragraph>,
                 ul: (props:any) => <Paragraph><ul {...props}></ul></Paragraph>,
-                li: (props:any) => <Paragraph><li {...props}></li></Paragraph>,
-                code: (props:any) => <Paragraph><Text code {...props}></Text></Paragraph>,
+                li: (props:any) => <Paragraph><li style={{fontSize: '16px'}}{...props}></li></Paragraph>,
+                code: (props:any) => <Text code {...props} />,
                 pre:  (props:any) => CodeBlock(props),
                 img: (props:any) => <img width='100%' style={{margin: '10px 0'}} {...props}/>,
-                p: (props:any) => <Paragraph><Text {...props}/></Paragraph>
+                p: (props:any) => <Paragraph><Text style={{fontSize: '16px'}} {...props}/></Paragraph>,
+                a: (props:any) => <Link {...props} target="_black"/>
             }}
         >
             {children}

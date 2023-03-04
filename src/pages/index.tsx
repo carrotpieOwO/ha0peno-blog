@@ -11,6 +11,7 @@ import { Location } from '@reach/router'
 import queryString from 'query-string'
 import withLocation from "../components/withLocation";
 import PropTypes from "prop-types"
+import styled from "styled-components";
 
 export type BlogType = {
   title: string | null | undefined;
@@ -42,6 +43,9 @@ function createCategory (data: BlogType) {
   return sort
 }
 
+const Container = styled.div`
+  padding: 5% 10%;
+`
 function IndexPage({data, search}: PageProps<Queries.BlogsQuery> | any) {
   const blogData:BlogType = Array.from(data.allMdx.nodes).map(blog => ({
     title: blog.frontmatter?.title,
@@ -100,33 +104,35 @@ function IndexPage({data, search}: PageProps<Queries.BlogsQuery> | any) {
 
   return (
     <ILayout>
-      <Row justify='center'>
-      {
-       [...Object.keys(categoryList)].map(category => (
-          <Button 
-            key={category} color="magenta" 
-            style={{marginBottom: '1em', marginRight: '1em'}} 
-            type={category === currentCategory ? 'primary' : 'default'}
-            onClick={() => setCurrentCategory(category)}
-          >
-            {category} ({categoryList[category]})
-          </Button>    
-        ))
-      }
-      </Row>
-      <Row justify="end" align='middle' gutter={20} style={{margin: '20px 0', gap: '10px'}}>
-      <Search search={searchTxt} setSearch={setSearchTxt}/>
-        <Radio.Group size="large" value={mode} onChange={(e) => setMode(e.target.value)}>
-          <Radio.Button value="gallery"><AppstoreTwoTone twoToneColor="#eb2f96"/></Radio.Button>
-          <Radio.Button value="list"><ProfileTwoTone twoToneColor="#eb2f96"/></Radio.Button>
-        </Radio.Group>
-      </Row>    
-      {
-        mode === 'gallery' ?
-        <Gallery viewData={viewData}/>
-        :
-        <BList viewData={viewData}/>
-      }
+      <Container>
+        <Row justify='center'>
+        {
+        [...Object.keys(categoryList)].map(category => (
+            <Button 
+              key={category} color="magenta" 
+              style={{marginBottom: '1em', marginRight: '1em'}} 
+              type={category === currentCategory ? 'primary' : 'default'}
+              onClick={() => setCurrentCategory(category)}
+            >
+              {category} ({categoryList[category]})
+            </Button>    
+          ))
+        }
+        </Row>
+        <Row justify="end" align='middle' gutter={20} style={{margin: '20px 0', gap: '10px'}}>
+        <Search search={searchTxt} setSearch={setSearchTxt}/>
+          <Radio.Group size="large" value={mode} onChange={(e) => setMode(e.target.value)}>
+            <Radio.Button value="gallery"><AppstoreTwoTone twoToneColor="#eb2f96"/></Radio.Button>
+            <Radio.Button value="list"><ProfileTwoTone twoToneColor="#eb2f96"/></Radio.Button>
+          </Radio.Group>
+        </Row>    
+        {
+          mode === 'gallery' ?
+          <Gallery viewData={viewData}/>
+          :
+          <BList viewData={viewData}/>
+        }
+      </Container>
     </ILayout>
   )
 }
