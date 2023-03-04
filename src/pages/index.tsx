@@ -53,7 +53,8 @@ function IndexPage({data, search}: PageProps<Queries.BlogsQuery> | any) {
     description: blog.excerpt,
     href: `${blog.frontmatter?.slug}`,
     date: blog.frontmatter?.date,
-    category: blog.frontmatter?.category
+    category: blog.frontmatter?.category,
+    body: blog.body
   }))
 
 
@@ -70,7 +71,7 @@ function IndexPage({data, search}: PageProps<Queries.BlogsQuery> | any) {
     if (searchTxt !== '' ) {
       const filterData = blogData.filter(
         blog => blog.title.toUpperCase().includes(searchTxt.toUpperCase()) 
-        || blog.description?.toUpperCase().includes(searchTxt.toUpperCase())
+        || blog.body?.toUpperCase().includes(searchTxt.toUpperCase())
       );
       // 검색결과에 해당하는 카테고리리스트만 보여주기
       setCategoryList(createCategory(filterData))
@@ -158,7 +159,7 @@ export const query = graphql`
           }
         },
         body,
-        excerpt(pruneLength:50)
+        excerpt(pruneLength:100)
       }
     }
    }

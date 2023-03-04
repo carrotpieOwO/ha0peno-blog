@@ -43,7 +43,7 @@ export default function Gallery(props: {viewData:BlogType}) {
                         }
                     >
                         <Tag color="magenta" style={{marginBottom: '1em'}}>{blog.category}</Tag>
-                        <Meta title={blog.title} description={blog.description}/>
+                        <Meta style={{height: '100px', overflow: 'hidden'}} title={blog.title} description={blog.description}/>
                         <div style={{marginTop: '2em', display: 'flex', justifyContent: 'end'}}>{blog.date}</div>
                     </ICard>
                 </List.Item>
