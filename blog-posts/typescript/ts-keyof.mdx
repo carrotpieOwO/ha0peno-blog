@@ -1,0 +1,49 @@
+---
+title: keyof 키워드, 타입변환기(mapping)
+category: TypeScript
+date: '2023-01-04'
+author: ha0peno
+slug: ts-keyof
+thumbnail: ts.png
+---
+
+# 1. keyof 연산자
+> `keyof Object` object타입이 가지고 있는 모든 key값을 union type으로 합쳐서 내보내준다.
+
+```ts
+interface Person {
+  age: number;
+  name: string;
+}
+type PersonKeys = keyof Person; //"age" | "name" (리터럴)타입이 됨
+let a :PersonKeys = 'age'; //가능
+let b :PersonKeys = 'ageeee'; //불가능
+```
+
+
+# 2. Mapped Types
+object내의 속성들을 다른 타입으로 한번에 변환하고 싶을 때 유용한 방법
+```ts
+type Car = {
+  color: boolean,
+  model : boolean,
+  price : boolean | number,
+}; 
+```
+**👇🏻 전부 string 타입으로 변경하려면** <br/>
+`[작명 in keyof 타입파라미터]: 변경할 타입`
+```ts
+type TypeChanger <MyType> = {
+  [key in keyof MyType]: string;
+};
+
+type 새로운타입 = TypeChanger<Car>;
+```
+**👇🏻 전부 원하는 타입으로 변경하려면**
+```ts
+type TypeChanger <MyType, T> = {
+  [key in keyof MyType]: T;
+};
+
+type 새로운타입 = TypeChanger<Car, string[]>;
+```

@@ -1,0 +1,40 @@
+---
+title: Gatsby - Image
+category: Gatsby
+date: '2023-02-26'
+author: ha0peno
+slug: gatsby-image
+thumbnail: gatsby.png
+---
+
+> [https://www.gatsbyjs.com/plugins/gatsby-plugin-image/#installation](https://www.gatsbyjs.com/plugins/gatsby-plugin-image/#installation)
+
+# 🌱 install
+`npm install gatsby-plugin-image gatsby-plugin-sharp gatsby-source-filesystem gatsby-transformer-sharp`
+
+# ⚙️ 설정
+![](https://velog.velcdn.com/images/ha0/post/0a575dad-f8b9-4c42-a7cd-9232bd327b28/image.png)
+
+# 1. Static Image
+![](https://velog.velcdn.com/images/ha0/post/7c6b6c00-9464-4fcb-a2c5-5f85e5846663/image.png)
+👉🏻 이 플로그인에서 제공하는 `StaticImage`로 생성된 요소를 살펴보면, 자동으로 반응형이미지로 만들어진 것을 볼 수 있다.
+![](https://velog.velcdn.com/images/ha0/post/4c36d46e-8b07-4f98-a690-ca46cadfdb4c/image.png)
+![](https://velog.velcdn.com/images/ha0/post/e3503852-535a-43ec-8b2b-3cb85f197ad9/image.gif)
+👉🏻 이미지 url도 직접 삽입한 url이 아닌 webp형식으로 변환해주기 때문에 용량도 작아지고, 심지어 사이즈를 변경하면 gatsby가 해당 사이즈의 이미지를 새로 변환하기 때문에 사용자가 고사양 이미지를 다운받지 않아도됨.
+# 2. Gatsby Image
+## 🐰 이미지 추가
+- mdx파일이랑 같은 폴더 내에 이미지 파일을 추가하고 이미지파일명을 mdx에 넣어준다.
+![](https://velog.velcdn.com/images/ha0/post/1e144a15-59cf-41d5-9d96-7619890e4f85/image.png)
+- 그런 다음에 GraphQL에서 확인해보면,
+![](https://velog.velcdn.com/images/ha0/post/845580b0-9035-461c-8320-424adabd5567/image.png)
+- 파일명만 넣었을 뿐인데 이미지 백그라운드컬러도 추출하고 반응형 사이즈도 생성해낸걸 확인할 수 있다. 
+## 🐰 이미지 넣기
+- `getImage`로 이미지객체를 생성한다.
+- 정적이미지가 아닌 동적으로 이미지를 생성하려면 `GatsbyImage`컴포넌트 사용
+![](https://velog.velcdn.com/images/ha0/post/fd8971c1-856d-4a51-9a6b-d27ffbc67f39/image.png)
+👉🏻 확인해보면 생성된 백그라운드컬러랑 같이 이미지가 로드되는데, 이미지에서 가장 많이 사용된 컬러를 추출해서 이미지의 placeholder로 사용한다고 한다.
+![](https://velog.velcdn.com/images/ha0/post/03082d81-56ab-45f9-a3e4-ef1d31030af7/image.gif)
+👉🏻 이 placeholder는 4가지 옵션으로 설정가능하다. (DOMINENT_COLOR, TRACED_SVG, BLURRED, NONE)
+![](https://velog.velcdn.com/images/ha0/post/ed8d66d3-bec4-4a0a-9abb-89e17fe86259/image.png)
+- 쿼리에서 이미지사이즈를 넣어주면 그 사이즈로 받아와서 생성해줌,,
+![](https://velog.velcdn.com/images/ha0/post/c80ccb48-910e-48a8-be23-cd4b859d7fb0/image.png)

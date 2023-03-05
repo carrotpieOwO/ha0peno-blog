@@ -1,14 +1,14 @@
 ---
-title: First Post!
-category: gatsby
-date: '2023-03-03'
+title: Gatsby 설치, 실행, 레이아웃 적용
+category: Gatsby
+date: '2023-02-25'
 author: ha0peno
 slug: gatsby-start
 thumbnail: gatsby.png
 ---
 
-> 🐝 Gatsby는 리액트 기반의 정적 사이트 생산 __프레임워크__이다.
-https://www.gatsbyjs.com/docs/
+> 🐝 Gatsby는 리액트 기반의 정적 사이트 생산 __프레임워크__이다. <br/>
+> [https://www.gatsbyjs.com/docs/](https://www.gatsbyjs.com/docs/)
 
 # Gatsby 핵심 포인트, 주의사항 
 렌더링될 때 데이터를 포함시키는 정적웹사이트(쇼핑몰, 블로그 등)에 적합하고 이용자별로 다른 데이터를 제공해야하는 동적인 웹사이트에는 적합하지 않다.
@@ -30,30 +30,30 @@ https://www.gatsbyjs.com/docs/
 
 
 
-## 1. install
+# 1. install
 `npm init gatsby`
 - Gatsby는 __프레임워크__이기때문에 __프로젝트 생성__이라는 프로세스가 필요하다.![](https://velog.velcdn.com/images/ha0/post/3f13fe55-b37a-4ac9-8b3c-e814ac917a3a/image.png)
 
-## 2. 개발모드 실행 
+# 2. 개발모드 실행 
 `npm run develop`
 - 빌드 성공 후 localhost:8000으로 접속
 ![](https://velog.velcdn.com/images/ha0/post/58425868-4397-46d5-9d91-b81a86764303/image.png)
 - 개발모드일 때는 작동방식이 react-app과 동일하다 (CSR방식)
 	- 자바스크립트 작동을 중지시키면, reatJS가 UI를 만들어주지 못하기 때문에 빈화면만 보게된다.
 
-## 3. 배포모드 실행
-### 빌드 : 
+# 3. 배포모드 실행
+## 빌드 : 
 `npm run build`
 ![](https://velog.velcdn.com/images/ha0/post/9aabd64d-32cd-43e6-abd0-e2c7af78f6d0/image.png)
 - 빌드되면, 404.tsx와 index.tsx를 만들어준다.
 - build/index.html로 가보면 reatJS코드(index.tsx)로 html페이지가 만들어져 있는걸 볼 수 있다.
-### 배포모드 실행:
+## 배포모드 실행:
 `npm runu serve`
 ![](https://velog.velcdn.com/images/ha0/post/47400285-9932-4dce-931a-a8ac40871100/image.png)
 - localhost:9000으로 접속
 - 자바스크립트 작동을 중지시켜도 Gatsby에 의해 완성된 html을 받아오게 되므로 문제없이 동작한다.
 
-## 4. 라우터
+# 4. 라우터
 - Gatsby는 프레임워크이기 때문에 이미 여러 기능들이 구현된 환경속에서 규칙에 따라 코드를 짜주기만 하면 된다. 그만큼 자유도는 떨어지지만, 다른거 신경안쓰고 페이지만 만들면 되기때문에 손쉽게 구현 가능하다. 
 - 라우터를 따로 만들지 않더라도, pages폴더안에 페이지를 만들면 파일명 주소로 페이지가 생성됨
 ![](https://velog.velcdn.com/images/ha0/post/bb806b33-3384-4264-ad32-e0ed9aad97f8/image.png)
@@ -61,13 +61,13 @@ https://www.gatsbyjs.com/docs/
 
 <br/>
 
-## 5. 레이아웃
+# 5. 레이아웃
 ## 📍 네비게이션
 - `<Link>`는 리액트 라우터에서 온게 아니라 Gatsby자체에서 온 것으로, 페이지간 이동을 시켜준다. (리액트 라우터 돔을 따로 설치안해도 잘 작동함)
 
 - navigation 컴포넌트를 생성하고, 각 분리된 페이지를 navigation컴포넌트로 감싼다.
-> create-react-app에 있던것들이 Gatsby에는 없기 때문에 create-react-app의 index.js처럼 네비게이션바를 포함한 모든 경로들을 import시키는 총체적(?)파일이 없기 때문.
-👉🏻 그래서 각 페이지들을 통일되게 보이게 하려면, 그 틀이되는 컴포넌트를 생성하고 각 페이지를 감싸주는 방법을 사용한다.
+> create-react-app에 있던것들이 Gatsby에는 없기 때문에 create-react-app의 index.js처럼 네비게이션바를 포함한 모든 경로들을 import시키는 총체적(?)파일이 없기 때문. <br/>
+> 👉🏻 그래서 각 페이지들을 통일되게 보이게 하려면, 그 틀이되는 컴포넌트를 생성하고 각 페이지를 감싸주는 방법을 사용한다.
 
 ![](https://velog.velcdn.com/images/ha0/post/45dbe0a8-2028-4949-8561-28a61ee5777f/image.png)
 ![](https://velog.velcdn.com/images/ha0/post/56c952ae-d634-4e31-81d3-488b9246bed2/image.png)

@@ -1,0 +1,163 @@
+---
+title: TypeScript Class
+category: TypeScript
+date: '2023-01-01'
+author: ha0peno
+slug: ts-class
+thumbnail: ts.png
+---
+
+# 1. 필드값 타입지정
+- 모든 자식 object들에게 속성을 부여해주고 싶으면 필드에 변수처럼 만든다. (var, let 키워드 안씀)
+```ts
+class Person {
+    data :number = 0; // 타입지정은 꼭 하지 않아도 자동으로 되니까 지정하지 않아도 무방함
+}
+
+let person1 = new Person('ha0');
+let person2 = new Person('hakoo');
+
+person1.data = 2;
+```
+
+# 2. constructor 타입지정
+- js와는 다르게 constructor함수를 쓰려면 미리 필드값으로 정의해줘야한다.
+- 필드값만으로도 지정할 수 있는데 constructor가 별도로 존재하는 이유는 파라미터를 받기 위함.
+```ts
+class Person {
+    name :string; // 필드값 미리 지정해야 this.name으로 갖다쓸수있다.
+    constructor(a: string) {
+        this.name = a;
+    }
+}
+
+let person1 = new Person('ha0');
+let person2 = new Person('hakoo');
+```
+## 📌 default parameter
+- js함수 문법 중에 있는 기본파라미터
+- 파리미터에 값을 입력하지 않으면 자동으로 할당해주는 것으로 __파라미터=자료__로 사용한다.
+- 활용하면 타입지정 안해도됨
+```ts
+class Person {
+    name;
+    constructor(a='kim') {
+        this.name = a;
+    }
+}
+```
+## 📌 rest parameter
+- js함수 문법 중에 있는 파라미터로 함수에 전달되는 인수들의 목록을 배열로 전달받는다. (파라미터로 무제한 입력가능)
+- rest parameter는 먼저 선언된 파라미터에 할당된 인수를 제외한 나머지 인수들이 모두 배열에 담겨 할당되므로, 반드시 가장 마지막 파라미터여야한다.
+- 뭐가 얼마나 들어올지 모르므로 타입지정 안해도됨
+```ts
+class Word {
+    num :number[];
+    str :string[];
+    name :string;
+    constructor(nm :string, ...params) {
+    	this.nm = nm;
+        this.str = [];
+        this.num = [];
+
+        params.forEach(p => {
+            if (typeof p === 'string') {
+                this.str.push(p)
+            } else if (typeof p === 'number') {
+                this.num.push(p)
+            }
+        })
+    }
+}
+```
+
+# 3. methods 타입지정
+- class 내부에는 함수를 입력할 수 있고, 이 함수는 class의 prototype에 추가된다.
+```ts
+class Person {
+    name :string;
+    constructor(a :string) {
+        this.name = a;
+    }
+    // prototype 함수 집어넣는 부분
+    resetName (a: string) {
+        this.name = a;
+    }
+}
+
+let person1 = new Person('ha0');
+let person2 = new Person('hakoo');
+
+person2.resetName('ha09')
+```
+
+
+# 4. 접근제한자
+- 타입스크립트를 쓰면 객체지향 언어에서 제공하는 public, private, static, protected와 같은 자바스크립트에 없는 문법도 사용가능하다.
+
+## 🍓 public 키워드
+- public 키워드를 붙이면 모든 자식들이 이용(수정) 가능하다.
+- public 키워드는 생략해도 자동으로 붙는 기본 키워드
+```ts
+	class User {
+    	public name = 'kim';
+	    constructor(a) {
+        	this.name = a;
+    	}
+    	public 함수() {
+        	
+    	}
+	}
+
+	let user = new User('park');
+    user.name = 'choi';
+```
+- 필드값을 생략하고 싶을 때도 public 키워드를 사용하면 축약가능하다.
+```ts
+	class Person {
+    	constructor(public name :string) {
+          // constructor에 들어온 파라미터는 자식의 name속성에 넣어달라는 뜻 => this.~ 생략가능
+    	}
+	}
+	let child = new Person('ha0');
+```
+
+## 🍓 private 키워드
+- private키워드가 붙으면, class안에서만 수정,이용가능하다.
+- 속성을 물려주기 싫은(보호하고 싶은) 속성들에 사용
+- 수정되면 안되는 속성을 실수로 수정하게되는 실수를 사전에 방지한다.
+![](https://velog.velcdn.com/images/ha0/post/7645d58b-8b26-4b5e-a042-f49179651f2e/image.png)
+📌 __private속성을 class외부(자식)에서 변경하고 싶을 경우__에는 class내부에 해당 속성의 변경함수를 넣어주면 된다.
+```ts
+	class User {
+    	name :string;
+    	private familyName :string = 'choi';
+    	constructor(a) {
+        	this.name = a + this.familyName;
+    	}
+
+	    changeFamillyName(a) {
+    	    this.familyName = a; 
+    	}	
+	}
+
+	let user = new User('ha0'); // name = ha0choi
+	user.changeFamillyName('song');
+```
+
+## 🍓 protected 키워드
+- __private 키워드__와 마찬가지로 class 내부에서만 이용가능하며, private키워드보다 확장성을 제공한다. __(class 및 하위class에서만 이용가능)__
+👉🏻 class를 extends해도 private키워드는 사용불가능
+![](https://velog.velcdn.com/images/ha0/post/bf289680-3ca9-49a1-a8a9-8475009925d6/image.png)
+👉🏻 __protected 키워드__는 extends된 class안에서 사용가능
+![](https://velog.velcdn.com/images/ha0/post/a1a34c39-2c10-4713-a351-f49710ef9336/image.png)
+
+## 🍓 static 키워드
+- static의 역할은 static의 필드값을 부모만 사용가능하게(자식들이 물려받지 못하게) 하는 것이다.
+- class의 주요기능인 object의 복사기능을 막는 것.
+- 하지만 extends할 경우에는 static필드값도 같이 따라옴
+![](https://velog.velcdn.com/images/ha0/post/fccfd7bc-d815-40ba-83e1-495a1e05b729/image.png)
+- private/protected/public + static 으로도 사용할 수 있다.
+- 주로 class안에 간단한 메모를 하거나, 기본 설정값을 입력하거나 class에서 생성되는 object가 사용할 필요가 없는 변수들을 만들고 싶을 때 사용한다.
+
+

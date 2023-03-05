@@ -1,0 +1,97 @@
+---
+title: Type Generic, 조건부 타입지정
+category: TypeScript
+date: '2023-01-03'
+author: ha0peno
+slug: ts-generic
+thumbnail: ts.png
+---
+
+
+- 아래와 같이 파라미터를 가변적으로 받고싶은 함수가 있을 경우, 파라미터를 unknown타입으로 받고 있기 때문에 return값인 파라미터[0]도 unknown타입이 되어 연산 시 에러가 발생한다. 
+```ts
+	function 함수(x :unknown[]) {
+    	return x[0]
+    }
+    
+    let a = 함수([4,2]) // <- a는 unknown타입, 4
+    a + 1 // <- error 발생
+```
+- 해결법은 narrowing ! 
+- 하지만, narrowing이 불편하고 귀찮다면? __Generic함수 만들기(파라미터로 타입을 입력하는 함수)__
+
+
+# Generic함수
+> - 선언시점이 아닌 __생성시점__에 __타입을 명시__하여 가변적으로 타입을 사용할 수 있게 한다.
+> - 즉, 함수의 파라미터로 타입을 입력가능하게 함 `funcion 함수명<Type작명>(){}`
+> - 한번의 선언으로 다양한 타입에 재사용 가능
+> - 이때 `타입 파라미터`의 작명은 `T`라고 작명하는 것이 관습.
+
+```ts
+	function 함수<T>(x :T[]) :T {
+    	return x[0]
+    }
+    
+    let a = 함수<number>([4,2])
+    console.log(a) // <- a는 number타입, 4
+    a + 1 // <- 정상작동
+    
+    let b = 함수<string>(['4','2']) // <- b는 string타입, '4'
+```
+- 타입 파라미터도 일반 함수파라미터 처럼 여러개 입력 가능하다.
+🍓 **장점: narrowing하는 것보다 확장성 있음**
+
+# 타입 파라미터 제한
+```ts
+	function 함수<MyType> (x :MyType) {
+		return x - 1 // <- error (무슨 타입이 들어올지 모름)
+	}
+```
+- 이럴 경우 narrowing해서 쓸 수도 있지만, 그게 귀찮다면 타입 파라미터에 제한을 두는 방법도 있다. **(constraints)** <br/>
+`function 함수명<type작명 extends 조건타입>(){}`  <br/>
+👉🏻 type파라미터가 extends뒤에오는 __type의 속성을 가지고 있는지 체크__한다. (여기서의 extends는 복사의 개념이 아닌 체크하는 개념)
+```ts
+	function 함수<MyType extends number> (x :MyType) {
+		return x - 1 // <- 정상작동
+	}
+```
+- 커스텀 타입도 extends가능
+
+
+# 조건부 타입지정
+- 타입 조건식은 주로 **extends키워드**와 **삼항연산자**를 이용한다.
+```ts
+	type Age<T> = T extends string ? string : unknown;
+	let age : Age<string> //age는 string 타입
+	let age2 : Age<number> //age는 unknown 타입
+```
+```ts
+	type FirstItem<T> = T extends any[] ? T[0] : any;
+
+	let age1 :FirstItem<string[]>; // string타입
+	let age2 :FirstItem<number>;  // any타입
+```
+
+
+## 🌱 infer 키워드
+> 조건문에서 쓸 수 있는 특별한 키워드로 **타입파라미터에서 타입을 추출하는 역할**
+👉🏻 `T extends infer R` : T(타입)을 유추해서 R이라는 변수에 집어넣음
+- `R`은 조건식 안에서 마음대로 사용가능하다.
+```ts
+type Person<T> = T extends infer R ? R : unknown; 
+type 새타입 = Person<string> // 새타입은 string 타입
+```
+
+
+🤔 **용도1**: array안에 있던 타입이 어떤 타입인지 뽑아서 변수로 만들 때
+```ts
+	type 타입추출<T> = T extends (infer R)[] ? R : unknown; 
+	type NewType = 타입추출< boolean[] > // NewType 은 boolean
+    type NewType2 = 타입추출< boolean > // NewType2는 unknown
+```
+🤔 **용도2**: 함수의 return 타입이 어떤 타입인지 뽑아서 변수로 만들 때
+```ts
+	type 타입추출<T> = T extends ( ()=> infer R ) ? R : unknown; 
+	type NewType = 타입추출< () => number > // NewType은 number 타입
+```
+

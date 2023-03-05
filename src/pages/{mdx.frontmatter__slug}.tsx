@@ -48,6 +48,13 @@ const ITag = styled(Tag)`
     margin-bottom: 20px;
     cursor: pointer;
 `
+const NavButton = styled(motion.div)`
+    max-height: 30px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: ${props => props.custom ? props.custom : 'left'};
+`
 
 interface IBlogPostProps {
     data: Queries.BlogDetailQuery;
@@ -130,12 +137,12 @@ export default function Detail({data, children}:IBlogPostProps) {
                                 style={{marginRight:'auto'}}
                                 onClick={() => navigate(`/${naviData.previous?.frontmatter?.slug}`)}
                             >
-                                <motion.div
+                                <NavButton
                                     whileHover={{x: [0, -10, 0], transition: {duration: .7}}}
                                 >
                                     <LeftCircleTwoTone twoToneColor="#eb2f96" style={{margin: '10px'}}/>
                                     <Text strong>{naviData.previous.frontmatter?.title}</Text>
-                                </motion.div>
+                                </NavButton>
                             </NaviCard>
                     }
                     {
@@ -144,12 +151,12 @@ export default function Detail({data, children}:IBlogPostProps) {
                                 style={{marginLeft:'auto'}}
                                 onClick={() => navigate(`/${naviData.next?.frontmatter?.slug}`)}
                             >
-                                <motion.div style={{textAlign: 'end'}} 
+                                <NavButton custom='end'
                                     whileHover={{x: [0, 10, 0], transition: {duration: .7}}}
                                 >
                                     <Text strong>{naviData.next.frontmatter?.title}</Text>
                                     <RightCircleTwoTone twoToneColor="#eb2f96" style={{margin: '10px'}}/>
-                                </motion.div>
+                                </NavButton>
                             </NaviCard>
                     }
                 </Row>

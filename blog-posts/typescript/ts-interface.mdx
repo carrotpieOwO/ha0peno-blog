@@ -1,0 +1,141 @@
+---
+title: TypeScript interface, index signature
+category: TypeScript
+date: '2023-01-01'
+author: ha0peno
+slug: ts-interface
+thumbnail: ts.png
+---
+
+# 1. interface 문법
+> - interface키워드로도 타입변수를 생성할 수 있다.
+`interface 인터페이스명 { key :type }`
+- type alias와 용도와 기능이 같다.
+`type Square = { color :string, width :number }` 
+= 
+`interface Square { color :string, width :number }`
+
+<br/>
+
+# 2. interface의 장점
+## ⭐️ extends로 복사가능
+```ts
+	interface Person { name :string }
+	interface Student extends Person {
+    	age :number
+	}
+
+
+	let student :Student = {name:'kim', age:20}
+```
+
+## ⭐️ implements 키워드 사용가능 (class 타입체크기능?)
+- class 우측에 `implements + interface` 를 쓰면 class가 interface에 있는 속성들을 다 들고 있는지 확인할 수 있다. 
+👉🏻 빠진 속성이 있을 경우 에러로 알려줌.
+
+```ts
+	interface Person {
+  		name : string,
+  		age : number
+	}
+
+	class Student implements Person {
+  		name : string;
+  		age : number = 10;
+  		constructor(a :string){
+    		this.name = a
+  		}
+	}
+	let 꼬마 = new Student('동자');
+```
+__❣️ implements는 class를 체크하는 용도이지 할당하는 것은 아님__
+
+# 3. type키워드와의 차이점
+
+- type alias도 extends와 유사한 기능을 만들 수 있다. __❗️(extends는 아님)__
+```ts
+	type Animal = { name :string}
+    type Cat = { age :number } & Animal // &기호(intersection type)
+    
+    let hakoo :Cat = {name: 'hakoo', age :3}
+```
+- extends와의 차이점은 복사해달란 뜻이 아니라 교차(두 타입을 전부 만족하는 타입)이라는 뜻.
+    
+
+- interface도 마찬가지로 &기호로 합쳐서 교차타입을 만들 수 있다.
+```ts
+	interface Student {
+  		name :string,
+	}
+	interface Teacher {
+  		age :number
+	}
+
+	let 변수 :Student & Teacher = { name : 'kim', age : 90 }
+```
+
+## 🤔 그래서 차이점은? 중복선언!
+- interface는 유연하기 때문에 중복선언이 가능하고, type은 엄격하기 때문에 중복선언이 불가능하다.
+- interface의 경우 타입이름을 중복선언하면 extends와 동일하게 동작한다.
+👉🏻 외부라이브러리 사용 시 type선언을 override하기 편리함
+![](https://velog.velcdn.com/images/ha0/post/e3a03137-57fa-41a2-844d-497f4bbc832d/image.png)
+- __반면, type은 엄격하기 때문에 중복선언이 불가능하다.__
+![](https://velog.velcdn.com/images/ha0/post/e0e7f052-eeab-453d-b792-d1e522bd52ba/image.png)
+
+즉, 다른 사람이 내 코드를 많이 이용하는 상황에서는 interface로 유연하게 만드는게 좋다. 
+
+## object 내의 속성이 중복될 경우
+- __extends로 중복속성 만들 경우 : interface생성 시 오류발생__
+![](https://velog.velcdn.com/images/ha0/post/0df2c37d-b3ab-4ebe-a115-4c699b10760c/image.png)
+
+- __&로 중복속성 만들 경우 :__ 합쳐달란 뜻이기 때문에 extends와 다르게 중복속성 발생 시 바로 에러를 발생하지 않고 타입을 변수에 할당 시 never타입으로 발생한다.
+![](https://velog.velcdn.com/images/ha0/post/a7eedc5e-feea-41aa-bd4f-4cee3a16cb8d/image.png)
+
+
+
+
+# 4. index signature
+> 1. object 자료 안에 어떤 속성들이 들어오는지 모르거나
+> 2. 타입지정할 속성이 너무 많은 경우 
+> <br/>
+> 👉🏻 index signature를 사용할 수 있다.
+
+- 타입 작성 시, `[key: type] :type`으로 적어주면 `{모든속성 :type}`이라는 뜻이 된다.<br/>
+(👏🏻 한줄로 모든 속성에 타입지정 가능)
+```ts
+	interface StringOnly {
+  		[key: string]: string
+	}
+
+	let obj :StringOnly = {
+  		name : 'kim',
+  		age : '20',
+  		location : 'seoul'
+	}
+```
+## 🪄 Recursive Index Signatures
+- 오브젝트 안에 오브젝트가 중첩으로 들어갈 경우 재귀적으로 타입을 부여할 수 있다.
+```ts
+	interface MyType {
+  		'font-size' : {
+    		'font-size' : {
+      			'font-size' : number
+    		}
+       	}
+  	}
+```
+**👇 한줄로 가눙함**
+```ts
+	interface MyType {
+  		'font-size': MyType | number
+	}
+
+
+	let obj :MyType = {
+  		'font-size' : {
+    		'font-size' : {
+      			'font-size' : 14
+    		}
+  		}
+	}
+```

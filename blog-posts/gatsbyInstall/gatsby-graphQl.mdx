@@ -1,0 +1,141 @@
+---
+title: Gatsby 데이터패칭 (GraphQL- 정적쿼리, 페이지 쿼리)
+category: Gatsby
+date: '2023-02-25'
+author: ha0peno
+slug: gatsby-graphql
+thumbnail: gatsby-graphql.jpeg
+---
+
+# 1. 데이터 패칭
+> - Gatsby는 Wordpress사이트나 Shopify상점, 블로그, filesystem, DB, API... 등으로부터 데이터를 끌어오게 해준다.  
+> - Gatsby는 서버를 별도로 만들 필요 없이 __GraphQL__로 요청만 하면 된다.  
+> - react로 데이터를 가져오는 방식도 물론 사용할 수 있지만, reactJS가 로드된 후에 데이터를 불러올 수 있기 때문에 로딩화면을 보게된다. 👉🏻 CSR방식이 되서 Gatsby를 쓰는 이유가 없어짐..
+> - 데이터를 html로 미리 구성해서 오길 바란다면 Gatsby로 데이터를 받아와야한다.
+
+
+# 2. GraphQL
+- 개발환경에서 돌리면 `localhost:8000`와 `localhost:8000___graphql`이라는 경로를 받게되는데, 이 경로가 바로 __GraphQL Expolorer__로, Gatsby가 내 웹사이트에 대해 담고있는 모든 데이터를 보여주는 곳이다!
+![](https://velog.velcdn.com/images/ha0/post/24b9bad1-8226-49e5-ad38-3ab8a65f938f/image.png)
+![](https://velog.velcdn.com/images/ha0/post/9218f549-510c-484b-93c3-60647c60bfad/image.png)
+
+- 그리고 이 정보는 gatsby-config.ts파일 내에 들어있다.
+![](https://velog.velcdn.com/images/ha0/post/e1679940-adcd-4921-8ddf-396d7e71d0e5/image.png)
+
+
+# 3. useStaticQuery
+
+- 정적쿼리: `useStaticQuery(grapql``)` 빌드단계에서 데이터를 받아와서 html파일 생성
+- GraphQL로 받아온 site의 title정보를 컴포넌트에서 받으려면 정적쿼리를 써서 받아오면된다. 
+```tsx
+export default function Seo({title}: ISeoProps) {
+    const data = useStaticQuery(graphql`
+        query SeoQuery {
+            site {
+                siteMetadata{
+                    title
+                }
+            }
+        }
+    `)
+
+    return <title>{title} | ha0peno's blog</title>
+}
+```
+![](https://velog.velcdn.com/images/ha0/post/c54a2b25-720e-4475-bd82-b2b4e41ee037/image.png)
+
+- gatsby-config.ts파일을 보면 GraphQL타입생성관련 설정`graphqlTypegen`이 true로 되어있는걸 볼 수 있는데, 이걸로 인해서 Gatsby가 쿼리를 읽고 자동으로 맞는 타입이 생성된다. 
+- gatsby-types.d.ts파일을 보면, Gatsby가 Seo쿼리를 읽고 자동타입을 생성해주고 있다.
+![](https://velog.velcdn.com/images/ha0/post/c5f32d27-b3f5-4635-a0f2-4b8266874720/image.png)
+👉🏻 쿼리 데이터의 타입이 자동생성되서
+![](https://velog.velcdn.com/images/ha0/post/589bc634-0bc5-402b-93a9-b4bce08f7272/image.png)
+👉🏻 그걸 필요한 곳에서 사용만해주면 된다.
+```tsx
+export default function Seo({title}: ISeoProps) {
+    const data = useStaticQuery(graphql`
+        query SeoQuery {
+            site {
+                siteMetadata{
+                    title
+                }
+            }
+        }
+    `)
+
+    return <title>{title} | {data.site?.sitemMetadata?.title}</title>
+}
+```
+![](https://velog.velcdn.com/images/ha0/post/c05242f5-09c6-4268-b505-ff1474444d2b/image.png)
+
+
+# 4. Page Query
+## 1. source-filesystem
+> 나의 파일을 Gatsby가 관찰할 수 있게 허용해주는 플러그인
+> [https://www.gatsbyjs.com/plugins/gatsby-source-filesystem/](https://www.gatsbyjs.com/plugins/gatsby-source-filesystem/)
+
+### 🌱 install
+`npm install gatsby-source-filesystem`
+
+### ⚙️ 설정
+- 옵션에서 파일 경로 설정
+![](https://velog.velcdn.com/images/ha0/post/4191375b-7a55-429c-a948-9cd128a675f7/image.png)
+### 🟣 GraphQL
+- 쿼리로 요청해서 filesystem에서 설정한 경로(blog-posts)의 파일데이터를 받을 수 있다.
+![](https://velog.velcdn.com/images/ha0/post/cb246a5f-8341-42ac-ac66-3062fe7cf8de/image.png)
+### 📝 페이지 적용
+![](https://velog.velcdn.com/images/ha0/post/0b3e5a51-e137-46f2-beb8-807ae26cf1b7/image.png)
+![](https://velog.velcdn.com/images/ha0/post/972bbcf0-89aa-467e-abd2-beee0e10a674/image.png)
+
+## 2. MDX
+> 전체 페이지를 Markdown + React를 활용해서 만들 수 있게 해줌
+> [https://www.gatsbyjs.com/plugins/gatsby-plugin-mdx/](https://www.gatsbyjs.com/plugins/gatsby-plugin-mdx/)
+
+### 🌱 install
+`npm install gatsby-plugin-mdx gatsby-source-filesystem @mdx-js/react`
+
+### ⚙️ 설정
+![](https://velog.velcdn.com/images/ha0/post/0dccd183-586b-4b11-9da0-7e4305467acb/image.png)
+
+### ✍🏻 MDX파일 작성
+![](https://velog.velcdn.com/images/ha0/post/197bb56a-c70b-4827-b0a9-ad0c3d92940d/image.png)
+
+### 🟣 GraphQL
+- GraphQL문서를 보면, mdx부분에 내가 생성한 데이터가 들어있음을 확인할 수 있다.
+![](https://velog.velcdn.com/images/ha0/post/42e4f749-d57b-475a-9340-87e8af301521/image.png)
+
+### 📝 페이지 적용
+![](https://velog.velcdn.com/images/ha0/post/220c3f7d-e23c-4802-92cc-1bcebe0fd26d/image.png)
+![](https://velog.velcdn.com/images/ha0/post/5ba98b57-52e9-4c9e-bd89-840ba31b0e6e/image.png)
+
+
+# 5. Dynamic Pages
+## 1. mdx에 slug작성
+	slug는 url의 제목을 써넣기 위해 작성하는 것
+![](https://velog.velcdn.com/images/ha0/post/349b2445-8ea2-429c-938c-37b7c07a7411/image.png)
+
+## 2. blog에 링크 달기
+![](https://velog.velcdn.com/images/ha0/post/f7810b74-b31e-405f-8afe-f1b172b891e9/image.png)
+
+## 3. 동적주소 가지는 파일 만들기
+`{mdx.frontmatter__slug}.tsx` 파일 생성하기
+![](https://velog.velcdn.com/images/ha0/post/e60632bf-84a1-4116-aa6d-ae37c779bfef/image.png)
+
+
+👉🏻 mdx플러그인이 mdx파일들을 지켜보고 있기 때문에, Gatsby가 mdx파일의 slug를 본 다음에 각각 그 페이지를 작성한 형식대로 만들어준다. (url형태만 맞다면, slug가 아닌 date등 원하는 값을 넣어줘도 된다.)
+![](https://velog.velcdn.com/images/ha0/post/c6b7ff42-3771-4a9d-8386-c4af3949bc8d/image.png)
+## 4. slug로 검색해서 상세내용 뿌려주기
+### 🔮 쿼리
+![](https://velog.velcdn.com/images/ha0/post/97d5c8e0-ca65-41ab-b2d2-9b7119a4c136/image.png)
+👉🏻 mdx파일로 동적으로 페이지를 생성했 듯(페이지가 slug이름으로 생성되었기 때문에), 페이지는 mdx의 정보를 가지고 있기 때문에 해당페이지의 slug로 상세내용을 검색할 수 있다.
+![](https://velog.velcdn.com/images/ha0/post/eb7f140f-35b9-4a39-852b-afd919bb1543/image.png)
+
+### 🔮 mdx내용 html로 받아오기
+👉🏻 mdx플러그인은 자동적으로 children을 제공해주는데, 그 chidren은 바로 body값을 react element로 받아온 것임 
+![](https://velog.velcdn.com/images/ha0/post/7f9e889d-d4ab-429f-a5b0-e39c6692c1b4/image.png)
+👉🏻 그래서 mdx가 자동으로 html로 변환되기 때문에 매우 편하게 만들 수 있다. 
+![](https://velog.velcdn.com/images/ha0/post/9d8653d8-0e8f-4333-8a82-335babc73a7a/image.png)
+
+
+
+
+

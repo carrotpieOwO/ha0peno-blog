@@ -1,0 +1,53 @@
+---
+title: Type script 외부파일 이용하기 - declare & d.ts 파일
+category: TypeScript
+date: '2023-01-03'
+author: ha0peno
+slug: ts-declare
+thumbnail: ts.png
+---
+
+# 1. declare 키워드 : 변수 재정의
+> 일반 js파일 등에 있던 변수를 사용 시 에러나지 않도록 재정의할 때 사용 <br/>
+> `declare let 변수 :타입;`
+> - declare가 붙은 코드들은 js로 변환되지 않는다.  <br/>
+> 👉🏻 컴파일러에게 힌트를 주는 역할의 코드이기 때문
+
+📌 `tsconfig.json`에서 `allowJS: true`로 설정하면 js파일도 타입지정이 알아서 implicit 하게된다.
+
+# 2. ambient module
+> ts파일끼리 변수를 가져다 쓰고 싶을 경우, import/export해서 쓰면 되지만,
+ts파일은 **ambient module(글로벌 모듈)**이므로 **⭐️ import/export없이도 모든 ts파일에서 그냥 가져다 쓸 수 있다.**
+
+<br/>
+📌 다른 파일에 영향을 끼치지 않기 위해 로컬모듈로 만들려면? **import, export 키워드**를 쓰면 된다.
+
+	👉🏻 ts파일 내에 import/export키워드가 하나라도 있으면 그 파일은 로컬모듈이 되므로, 공유할 변수는 export해주고 사용할 곳에서 import해줘야함.
+	
+
+# 3. declare global
+> **로컬모듈**에서 **전역변수**를 만들고 싶으면 `declare global {}`에 생성 <br/>
+> 👉🏻 모든 파일에서 해당 변수 사용 가능해짐
+> - global이라는 이름의 namespace에 추가된다고 볼 수 있다.
+
+# 4. d.ts 파일
+> - 타입만 저장할 수 있는 파일형식
+> - 로컬모듈이다.
+
+
+## 🍓 타입저장용 d.ts
+- 타입정의만 따로 하고 import해서 사용하는 용도.
+- 로컬모듈이므로 export해서 써야한다.
+- 한번에 많은 타입을 export하고 싶은 경우 `namespace`에 담거나,`import * as`해서 사용
+## 🍓 레퍼런스용 d.ts
+- `tsconfig.json`에서 `declaration: true`로 설정하면 ts파일 저장 시 자동으로 해당 ts파일의 d.ts파일이 생성된다.
+- 열어보면 ts파일의 모든 변수와 함수 타입정의가 들어있다.
+## 🍓 d.ts파일을 글로벌모듈로 
+프로젝트 내에 타입저장용 폴더 생성 후, `tsconfig.json`에서 `typeRoots: [해당폴더 경로]`옵션을 추가하면 ts파일 작성 시 타입이 없으면 자동으로 해당 폴더 내에서 타입을 찾아서 적용해준다.
+- **typeRoots옵션**을 사용할 경우, **declaration(d.ts자동생성기능)옵션**은 끄는 것이 좋다.
+- 하지만 로컬타입과 글로벌타입이 겹칠 수 있으므로 **import/export**로 쓰는 것이 안전하다.
+## 📍 유명한 js라이브러리의 d.ts파일
+🔗  [DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped): 주로 쓰는 라이브러리를 모아놓은 github repository <br/>
+🔗 [@types 라이브러리](https://www.npmjs.com/~types): 타입정의된 npm패키지를 찾아서 npm으로 설치하여 사용할 수 있다. <br/>
+🌱 npm으로 설치하면 node_modules/@types경로에 설치가 되고, 만약 "typeRoots"옵션이 있는 경우에는 해당경로도 추가해줘야 한다.
+

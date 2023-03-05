@@ -77,7 +77,7 @@ interface HeadingProps {
 // 목차생성을 위한 id 부여
 const Heading = ({ children, level }: HeadingProps) => {
     return (
-        <Title id={children.replace(/\W/g,'-')} level={level}>{children}</Title>
+        <Title id={children.replace(/\W/g,'-')} level={level} style={{marginTop:'2em'}}>{children}</Title>
     )
 }
 

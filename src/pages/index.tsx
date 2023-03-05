@@ -36,7 +36,7 @@ function createCategory (data: BlogType) {
   for (const key in blogObj) {
     blogObj[key] = getCategoryLength(data, key)
   }
-  blogObj['all'] = data.length;
+  blogObj['All'] = data.length;
 
   // 카테고리명(key값)으로 정렬
   const sort =  Object.fromEntries(Object.entries(blogObj).sort(([a], [b]) => a < b ? -1 : 1))
@@ -59,7 +59,7 @@ function IndexPage({data, search}: PageProps<Queries.BlogsQuery> | any) {
 
 
   const categories = createCategory(blogData);
-  const queryStr = Object.keys(categories).includes(search.category) ? search.category : 'all';
+  const queryStr = Object.keys(categories).includes(search.category) ? search.category : 'All';
 
   const [ categoryList, setCategoryList ] = useState(categories);
   const [ currentCategory, setCurrentCategory ] = useState(queryStr);
@@ -77,11 +77,11 @@ function IndexPage({data, search}: PageProps<Queries.BlogsQuery> | any) {
       setCategoryList(createCategory(filterData))
 
       // 카테고리가 선택될 경우 해당 카테고리만 보여주기
-      if(currentCategory !== 'all') {
+      if(currentCategory !== 'All') {
         const filter = filterData.filter(blog => blog.category === currentCategory);
         // 선택된 카테고리에 데이터가 없으면 전체카테고리 보여주기
         if(filter.length === 0) {
-          setCurrentCategory('all')
+          setCurrentCategory('All')
         } 
         setViewData(filter);
       } else {
@@ -92,7 +92,7 @@ function IndexPage({data, search}: PageProps<Queries.BlogsQuery> | any) {
       // searchTxt가 빈값일 경우 모든 카테고리 보여주기
       setCategoryList(createCategory(blogData))
 
-      if(currentCategory !== 'all') {
+      if(currentCategory !== 'All') {
         // 카테고리가 선택될 경우 해당 카테고리만 보여주기
         const filter = blogData.filter(blog => blog.category === currentCategory);
         setViewData(filter);
