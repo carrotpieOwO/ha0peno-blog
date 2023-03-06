@@ -1,0 +1,100 @@
+---
+title: Gatsby - query string으로 페이지간 값 전달하기
+category: Gatsby
+date: '2023-03-05'
+author: ha0peno
+slug: gatsby-querystr
+thumbnail: gatsby-querystr.png
+---
+
+> 상세페이지에서 카테고리명을 클릭할 경우, 메인페이지에서 해당 카테고리가 필터링 되는 기능을 구현할 겸
+> gatsby의 쿼리스트링기능을 사용해보기로 하였다.
+
+# 🐰 query-string install
+`npm install query-string` <br/><br/>
+👉🏻 참고한 블로그에서는 @reach/router도 받던데 나의 경우 gatsby를 설치 할 때, 기본적으로 들어가 있어서 따로 설치하지 않았다.
+
+# 🐰 withLocation 컴포넌트 생성
+- Reach Router의 위치공급자에서 속성을 읽고 하위 구성요소를 전달하는 HOC를 생성한다.
+```tsx
+import React from 'react'
+import { Location } from '@reach/router'
+import queryString from 'query-string'
+
+const withLocation = ComponentToWrap => props => (
+  <Location>
+    {({ location, navigate }) => (
+      <ComponentToWrap
+        {...props}
+        location={location}
+        navigate={navigate}
+        search={location.search ? queryString.parse(location.search) : {a:0}}
+      />
+    )}
+  </Location>
+)
+
+export default withLocation
+```
+
+# 🐰 쿼리스트링의 매개변수를 사용할 페이지 설정
+- 사용할 페이지전체를 withLocation()로 감싸준다.
+- 나의 경우, 메인페이지에서 쿼리스트링의 value값에 따라 카테고리를 필터링해서 보여줄 것이기 때문에 `index`페이지에 적용해주었다.
+```tsx
+function IndexPage({data, search}: PageProps<Queries.BlogsQuery> | any) {
+  
+  // search로 들어온 쿼리스트링 값이 category리스트에 포함되어 있으면 해당 카테고리 선택
+  // 없을경우 'All'선택
+  const queryStr = Object.keys(categories).includes(search.category) ? search.category : 'All';
+
+  const [ currentCategory, setCurrentCategory ] = useState(queryStr);
+
+  useEffect(() => {
+      // 카테고리가 선택될 경우 해당 카테고리만 보여주기
+      if(currentCategory !== 'All') {
+        const filter = blogData.filter(blog => blog.category === currentCategory);
+        // 선택된 카테고리에 데이터가 없으면 전체카테고리 보여주기
+        if(filter.length === 0) {
+          setCurrentCategory('All')
+        } 
+        setViewData(filter);
+      } else {
+        setViewData([...blogData])
+      }
+  }, [currentCategory])
+
+  return (
+    // 이하 생략
+  )
+}
+
+IndexPage.propTypes = {
+  search: PropTypes.object,
+}
+export default withLocation(IndexPage)
+```
+
+# 🐰 상세페이지에서 메인페이지로 쿼리스트링 전달
+```tsx
+export default function Detail({data, children}:IBlogPostProps) {    
+    return (
+        // 이하생략
+        <ITag color="magenta"
+            onClick={()=> navigate(`/?category=${frontMatter?.category}`)}
+        >
+            {frontMatter?.category}
+        </ITag>
+        // 이하생략
+    )
+}
+```
+# 🐰 결과
+- `/?category=Gatsby`로 매개변수가 잘 전달된다.
+![](https://velog.velcdn.com/images/ha0/post/4c1eca8b-b940-484d-848b-a2d07451edca/image.gif)
+
+<br/>
+<br/>
+<br/>
+<br/>
+**🔗 references**<br/>
+- [https://medium.com/@chrisfitkin/how-to-get-query-string-parameter-values-in-gatsby-f714161104f](https://medium.com/@chrisfitkin/how-to-get-query-string-parameter-values-in-gatsby-f714161104f)

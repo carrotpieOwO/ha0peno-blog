@@ -43,11 +43,12 @@ const CodeBlock = ({ children }:any) => {
     const className = children.props.className || '';
     const matches = className.match(/language-(?<lang>.*)/);
     const language = matches?.groups?.lang ?? '';
-  
+    const { props: { children: source } } = children
+
     return (
         <Highlight
             {...defaultProps}
-            code={children.props.children.trim()}
+            code={source}
             language={language}
             theme={theme}
         >

@@ -1,0 +1,151 @@
+---
+title: Gatsby - MDX Code Block 스타일링
+category: Gatsby
+date: '2023-03-05'
+author: ha0peno
+slug: gatsby-codeblock
+thumbnail: gatsby-code.png
+---
+
+
+# prism-react-renderer install
+> gatsby-plugin-mdx를 사용하고 있는데, 코드의 기본 스타일이 너무 안예뻐서 예쁜 스타일로 적용해보려고 찾아보다가,
+> `prism-react-renderer`를 사용하기로 하였다.
+
+`npm install prism-react-renderer`
+
+# 컴포넌트 생성
+- 그리고 공식문서에 있는 `CodeBlock`컴포넌트를 가져온 뒤, language 등을 파싱하고 `theme`을 원하는걸로 적용해준다.
+
+```ts
+import theme from 'prism-react-renderer/themes/dracula'; // 테마는 github 외에도 많다
+
+const CodeBlock = ({ children }:any) => {
+    const className = children.props.className || '';
+    const matches = className.match(/language-(?<lang>.*)/);
+    const language = matches?.groups?.lang ?? '';
+    const { props: { children: source } } = children
+
+    return (
+        <Highlight
+            {...defaultProps}
+            code={source}
+            language={language}
+            theme={theme}
+        >
+            {({ className, tokens, getLineProps, getTokenProps }) => (
+                    <pre className={className}>
+                        {tokens.map((line, i) => (
+                            <div {...getLineProps({ line, key: i })}>
+                                {line.map((token, key) => (
+                                <span {...getTokenProps({ token, key })} />
+                                ))}
+                            </div>
+                        ))}
+                    </pre>
+            )}
+        </Highlight>
+    );
+};
+```
+# 스타일링
+- 기본테마도 예쁘지만, 나는 뭔가 ios화면 처럼 만들고 싶어서 다른 컴포넌트를 만들어서 감싸주었다.
+```tsx
+// ios 버튼틀
+const Circle = styled.div`
+    width: 16px;
+    height: 16px;
+    background-color: ${props => props.color};
+    border-radius: 8px;
+`
+// ios 테마 헤더
+const CodeBlockHeader = () => {
+    return (
+        <div style={{display: 'flex', gap: '10px', marginBottom: '24px'}}>
+            <Circle color={'#FF5F56'}/>
+            <Circle color={'#FFBD2E'}/>
+            <Circle color={'#27C93F'}/>
+        </div>
+    )
+}
+// 컨테이너
+const CodeBlockContainer = styled.div`
+    margin: 1em;
+    background-color: #2c2c2c;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    padding: 24px;
+    overflow: scroll;
+`
+```
+```tsx
+const CodeBlock = ({ children }:any) => {
+    const className = children.props.className || '';
+    const matches = className.match(/language-(?<lang>.*)/);
+    const language = matches?.groups?.lang ?? '';
+    const { props: { children: source } } = children
+
+    return (
+        <Highlight
+            {...defaultProps}
+            code={source}
+            language={language}
+            theme={theme}
+        >
+            {({ className, tokens, getLineProps, getTokenProps }) => (
+                <CodeBlockContainer> // 컨테이너로 감싸주고
+                    <CodeBlockHeader/> // ios헤더 삽입
+                    <pre className={className}>
+                        {tokens.map((line, i) => (
+                            <div {...getLineProps({ line, key: i })}>
+                                {line.map((token, key) => (
+                                <span {...getTokenProps({ token, key })} />
+                                ))}
+                            </div>
+                        ))}
+                    </pre>
+                </CodeBlockContainer>
+            )}
+        </Highlight>
+    );
+};
+```
+# MDX Provider에 컴포넌트 적용
+```tsx
+export default function MDXLayout({children} :any) {
+    return (
+        <MDXProvider
+            components={{
+                pre:  (props:any) => CodeBlock(props),
+            }}
+        >
+            {children}
+        </MDXProvider>
+    )
+}
+```
+# MDX를 사용하는 페이지에 MDXLayout 컴포넌트 적용하기
+```tsx
+<ContentCard actions = {[<Comment/>]}>
+    <ITag color="magenta"
+        onClick={()=> navigate(`/?category=${frontMatter?.category}`)}
+    >
+        {frontMatter?.category}
+    </ITag>
+    <Title>{frontMatter?.title}</Title>
+    <div style={{display: 'flex', justifyContent: 'space-between'}}>
+        <Text type="secondary">{frontMatter?.date}</Text>
+        <Text type="secondary">{frontMatter?.author} 👩🏻‍💻</Text>
+    </div>
+    <Divider/>
+    <MDXLayout>{children}</MDXLayout>
+</ContentCard>
+```
+
+<br/>
+<br/>
+<br/>
+<br/>
+
+**🔗 references :**
+[https://www.gatsbyjs.com/docs/how-to/routing/customizing-components/](https://www.gatsbyjs.com/docs/how-to/routing/customizing-components/)

@@ -1,0 +1,165 @@
+---
+title: Gatsby - 🔮Utterances 댓글 다크모드 적용
+category: Gatsby
+date: '2023-03-04'
+author: ha0peno
+slug: gatsby-comment
+thumbnail: gatsby-comment.png
+---
+
+> 블로그에 댓글기능을 추가하고 싶어서 알아보던 중, 깃헙의 `utterances`를 사용했다. <br/>
+> 이유는 깃헙에 로그인을 해야 댓글을 달 수 있고, 마크다운을 사용할 수 있고, 직접 구현하지 않고 삽입해서 바로 사용가능하기 때문이다.
+
+# Create Repository & Install Utterances
+- 우선 댓글용 레포지터리를 새로 생성한 뒤,
+- [Install Utterances](https://github.com/apps/utterances)에서 앱을 설치하고 새로 생성한 레포지터리를 연결한다.
+- 그럼 아래 스크립트가 생성된다.
+```html
+<script
+  src="https://utteranc.es/client.js"
+  repo="레포지트리명"
+  issue-term="pathname"
+  theme="github-light"
+  crossorigin="anonymous"
+  async
+></script>
+```
+
+# Comment 컴포넌트 생성
+- 리액트는 xss보안 이슈 때문에 위 스크립트가 적용된 컴포넌트를 생성해줘야한다.
+```tsx
+import React, { useEffect } from "react"
+
+const COMMENTS_ID = 'comments-container';
+
+export default function Comment() {
+  useEffect(() => {
+      const script = document.createElement('script');
+      script.src = 'https://utteranc.es/client.js';
+      script.setAttribute('repo', "레포지트리명");
+      script.setAttribute('issue-term', 'pathname');
+      script.setAttribute('theme', 'github-light');
+      script.setAttribute('crossorigin', 'anonymous');
+      script.async = true;
+
+      const comments = document.getElementById(COMMENTS_ID);
+      if (comments) comments.appendChild(script);
+
+      return () => {
+          const comments = document.getElementById(COMMENTS_ID);
+          if (comments) comments.innerHTML = '';
+      };
+  }, []);
+
+  return (
+      <div id={COMMENTS_ID} />
+  );
+};
+```
+
+# Comment 컴포넌트 삽입
+- 원하는 위치에 Comment 컴포넌트를 삽입한다.
+- 나의 경우, 블로그 게시글(`{mdx.frontmatter__slug}.tsx`)에 삽입해주었는데, <br/>
+Antd를 사용하고 있기 때문에, Card의 actions에 삽입해서 카드 하단에 넣어주도록 했다. 
+```tsx
+    <ContentCard actions = {[<Comment/>]}> // <- 코멘트삽입
+        <ITag color="magenta"
+            onClick={()=> navigate(`/?category=${frontMatter?.category}`)}
+        >
+            {frontMatter?.category}
+        </ITag>
+        <Title>{frontMatter?.title}</Title>
+        <div style={{display: 'flex', justifyContent: 'space-between'}}>
+            <Text type="secondary">{frontMatter?.date}</Text>
+            <Text type="secondary">{frontMatter?.author} 👩🏻‍💻</Text>
+        </div>
+        <Divider/>
+        <MDXLayout>{children}</MDXLayout>
+    </ContentCard>
+    {
+        headings && anchor &&
+        <div style={{marginLeft: 'auto', maxWidth: '200px'}}>
+            <Anchor style={{marginTop: '200px'}} items={headings} targetOffset={300} />
+        </div>
+    }
+```
+
+# Comment 초기 theme 설정
+- 본 블로그는 사용자가 theme을 변경하면, 로컬스토리지에 저장해두었다가
+- 재방문시 해당 theme으로 적용되도록 설정되어있어서 초기 theme을 설정해주었다.
+```tsx
+import React, { useEffect } from "react"
+
+const COMMENTS_ID = 'comments-container';
+// window같은 브라우저 전역객체는 gatsby빌드 시, node.js가 해당 객체들을 가지고 있지 않아서 빌드에러가 생기기 때문에 조건문으로 처리해줘야함.
+const isBrowser = () => typeof window !== "undefined" 
+// 로컬스토리지에 theme을 가져옴, 없을 경우 디폴트는 light
+const localTheme =  isBrowser() && window.localStorage.getItem('theme');
+const theme = localTheme === 'dark' ? 'photon-dark' : 'github-light';
+
+export default function Comment() {
+  useEffect(() => {
+      const script = document.createElement('script');
+      script.src = 'https://utteranc.es/client.js';
+      script.setAttribute('repo', "carrotpieOwO/ha0peno-comment");
+      script.setAttribute('issue-term', 'pathname');
+      // 가져온 theme 넣어주기
+      script.setAttribute('theme', theme);
+      script.setAttribute('crossorigin', 'anonymous');
+      script.async = true;
+
+      const comments = document.getElementById(COMMENTS_ID);
+      if (comments) comments.appendChild(script);
+
+      return () => {
+          const comments = document.getElementById(COMMENTS_ID);
+          if (comments) comments.innerHTML = '';
+      };
+  }, []);
+
+  return (
+      <div id={COMMENTS_ID} />
+  );
+};
+```
+
+# 동적으로 theme 변경하기
+- `useTheme()` 커스텀hook을 통해 theme을 변경해주고 있어서 그 안에 comment테마를 변경하는 코드를 추가해주었다. 
+- utterances는 `iframe`으로 생성되기 때문에 `window.postMessage()`메서드를 사용하면 `iframe`에 메세지 이벤트를 전달할 수 있다.
+- 이를 활용하여 `HTMLIframeElement.contentWindow`속성을 통해 `iframe`에 접근하여 테마가 변경될 때 이벤트를 전달하도록 하였다.
+```tsx
+const useTheme = () => {
+    const localTheme =  isBrowser() && window.localStorage.getItem('theme') as ThemeType;
+    const initialTheme = localTheme || 'light' as ThemeType;
+    const [ themeMode, setThemeMode ] = useState<ThemeType>(initialTheme);
+
+    const setMode = (mode: ThemeType) => {
+        isBrowser() && localStorage.setItem('theme', mode);
+        setThemeMode(mode);
+
+        const isComment = document.querySelector('iframe.utterances-frame');
+        if (isComment) {
+            const utterancesTheme = mode === 'light' ? "github-light" : "photon-dark" ;
+            (
+              document?.querySelector("iframe.utterances-frame")?.contentWindow.postMessage(
+                { type: "set-theme", theme: utterancesTheme },
+                "https://utteranc.es/"
+              )
+            )
+        }
+    };
+
+    const themeToggler = () => {
+        themeMode === 'light' ? setMode('dark') : setMode('light')
+    }
+
+    return { themeMode, themeToggler };
+}
+```
+# 결과
+![](https://velog.velcdn.com/images/ha0/post/1a5c6666-b439-41da-b98b-8260f6ac07d9/image.gif)
+<br/>
+<br/>
+<br/>
+**🔗 references** <br/>
+[https://www.sungikchoi.com/blog/gatsby-dark-mode/](https://www.sungikchoi.com/blog/gatsby-dark-mode/)
