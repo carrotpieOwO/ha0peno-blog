@@ -60,6 +60,7 @@ const Cover = styled(motion.div)`
     position: relative;
     border-bottom: 1px solid black;
     overflow: hidden;
+    background-color: ${props => props.theme.themeMode === 'light' ? 'rgb(245, 102, 135)' : 'rgb(91, 94, 118)'};
 `
 const HomeImg = styled(motion.img)`
     position: absolute;
@@ -128,6 +129,7 @@ export default function ILayout({children} :LayoutProps) {
                         Git
                     </GitBtn>
                 </Nav>
+                <ThemeProvider theme={{themeMode}}>
                 <Cover animate={{backgroundColor: themeMode === 'light' ? 'rgb(245, 102, 135)' : 'rgb(91, 94, 118)'}}>
                     ha0peno
                     <HomeImg
@@ -137,7 +139,6 @@ export default function ILayout({children} :LayoutProps) {
                         onClick={() => navigate('/')}
                     />
                 </Cover>
-                <ThemeProvider theme={{themeMode}}>
                     <Content style={{ minHeight: '100vh'}}>
                         {children}
                     </Content>

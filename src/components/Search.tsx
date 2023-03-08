@@ -40,7 +40,7 @@ export default function Search({search, setSearch}: searchProps) {
 
     return (
         <>
-            <InputWrap animate={{ scaleX: searchOpen ? 1 : 0}}>
+            <InputWrap initial={{scaleX: 0}} animate={{ scaleX: searchOpen ? 1 : 0}}>
                 
                 <Input
                     size="large" 

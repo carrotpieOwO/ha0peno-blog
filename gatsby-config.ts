@@ -19,6 +19,7 @@ const config: GatsbyConfig = {
     'gatsby-plugin-mdx',
     'gatsby-plugin-react-helmet',
     `gatsby-plugin-sitemap`,
+    `gatsby-plugin-styled-components`,
     {
       resolve: `gatsby-source-filesystem`,
       options: {
