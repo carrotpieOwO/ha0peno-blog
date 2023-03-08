@@ -15,6 +15,8 @@
 </p>
 <br/>
 
-## 👉🏻 [블로그 구경하기](https://ha0peno-blog.netlify.app/)
-<img src="https://velog.velcdn.com/images/ha0/post/cc7a4199-4469-4efb-af59-3aab76dc46a1/image.png" align="left" width="49%">
-<img src="https://velog.velcdn.com/images/ha0/post/6044978a-cee7-4a59-b295-5d7ce7998e77/image.png" align="right" width="49%">
+### 👉🏻 [블로그 구경하기](https://ha0peno-blog.netlify.app/)
+<div style="dispaly: flex">
+<img src="https://velog.velcdn.com/images/ha0/post/cc7a4199-4469-4efb-af59-3aab76dc46a1/image.png" width="400">
+<img src="https://velog.velcdn.com/images/ha0/post/6044978a-cee7-4a59-b295-5d7ce7998e77/image.png" width="400">
+</div>
