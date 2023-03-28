@@ -130,15 +130,15 @@ export default function ILayout({children} :LayoutProps) {
                     </GitBtn>
                 </Nav>
                 <ThemeProvider theme={{themeMode}}>
-                <Cover animate={{backgroundColor: themeMode === 'light' ? 'rgb(245, 102, 135)' : 'rgb(91, 94, 118)'}}>
-                    ha0peno
-                    <HomeImg
-                        src={themeMode === 'light' ? dayticon : nightticon} 
-                        alt="ha0peno" 
-                        whileHover={{scale: 1.2}}
-                        onClick={() => navigate('/')}
-                    />
-                </Cover>
+                    <Cover animate={{backgroundColor: themeMode === 'light' ? 'rgb(245, 102, 135)' : 'rgb(91, 94, 118)'}}>
+                        ha0peno
+                        <HomeImg
+                            src={themeMode === 'light' ? dayticon : nightticon} 
+                            alt="ha0peno" 
+                            whileHover={{scale: 1.2}}
+                            onClick={() => navigate('/')}
+                        />
+                    </Cover>
                     <Content style={{ minHeight: '100vh'}}>
                         {children}
                     </Content>
