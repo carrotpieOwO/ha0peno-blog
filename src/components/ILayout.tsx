@@ -109,7 +109,7 @@ export default function ILayout({children} :LayoutProps) {
                     <IFooter>
                         <Flex gap={3}>
                             <Link href="https://github.com/carrotpieOwO" target="_blank">gitHub</Link>
-                            <Link href="https://ha0peno.vercel.app" target="_blank">portfolio</Link>
+                            <Link href="https://ha0peno.netlify.app/" target="_blank">portfolio</Link>
                         </Flex>
                         <Flex>
                             © 2023 ha0peno 
