@@ -1,8 +1,8 @@
-import React, { ChangeEvent, ChangeEventHandler, FormEvent, KeyboardEventHandler, useEffect, useRef, useState } from "react"
-import { Input, Button, InputRef, Form } from 'antd';
-import { SearchOutlined } from "@ant-design/icons";
+import React, { ChangeEvent, useEffect, useRef, useState } from "react"
 import styled from "styled-components";
 import { motion } from "framer-motion";
+import { Input, IconButton } from '@chakra-ui/react'
+import { SearchIcon } from '@chakra-ui/icons'
 
 const InputWrap = styled(motion.div)`
     transform-origin: right center;
@@ -23,7 +23,7 @@ export default function Search({search, setSearch}: searchProps) {
     const toggleSearch = () => {
         setSearchOpen(!searchOpen);
     }
-    const searchRef = useRef<InputRef>(null);
+    const searchRef = useRef(null);
 
     useEffect(() => {
         searchRef.current?.focus({
@@ -41,18 +41,20 @@ export default function Search({search, setSearch}: searchProps) {
     return (
         <>
             <InputWrap initial={{scaleX: 0}} animate={{ scaleX: searchOpen ? 1 : 0}}>
-                
                 <Input
-                    size="large" 
+                    size="md" 
+                    variant='outline'
                     placeholder="내가 찾는게 있을까? 🤔" 
+                    focusBorderColor='pink.500'
                     ref = {searchRef}
                     onChange={onChange}
                     value={searchInput}
-                    allowClear
                 />
             </InputWrap>
             <motion.div>
-                <Button shape="circle" icon={<SearchOutlined />} onClick={toggleSearch}/>
+                <IconButton aria-label='Search database' icon={<SearchIcon />} onClick={toggleSearch} 
+                    colorScheme='pink' size='sm'
+                />
             </motion.div>
         </>
     )

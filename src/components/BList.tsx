@@ -1,43 +1,32 @@
 import React, { useState } from "react";
 import { navigate } from "gatsby"
-import { Card, List, Typography } from 'antd';
 import { BlogType } from "../pages";
-const { Title, Text } = Typography;
+import { Card, Badge, CardBody, Stack, Box, Heading, Text, StackDivider } from '@chakra-ui/react'
 
 export default function BList(props: {viewData:BlogType}) {
     const [ hover, setHover ] = useState('');
     
     return (
         <Card >
-            <List
-                itemLayout="vertical"
-                size="large"
-                pagination={{
-                    align: 'center', 
-                    pageSize: 10,
-                }}
-                dataSource = {props.viewData}
-                renderItem={(item) => (
-                    <List.Item
-                        key={item.title}
-                        style={{cursor: 'pointer'}}
-                        onClick={() => navigate(item.href)}
-                        onMouseOver={() => setHover(item.title as string)}
-                        onMouseLeave={() => setHover('')}
-                    >
-                        <Text style={{color:'#eb2f96'}}>{item.category}</Text>
-                        <List.Item.Meta
-                            title={<Title level={3}>{item.title}</Title>}
-                            description={
-                            <Text type="secondary" underline={hover === item.title}>{item.description}</Text>
-                            }
-                            style={{margin: '30px 0'}}
-                        />
-                        <Text type="secondary">{item.date}</Text>
-                    </List.Item>
-                    )}
-            >
-            </List>
+            <CardBody>
+                <Stack divider={<StackDivider />} spacing='15'>
+                    {
+                        props.viewData.map( blog => 
+                            <Box p={4} style={{cursor: 'pointer'}}
+                                key={blog.title}
+                                onClick={() => navigate(blog.href)}
+                                onMouseOver={() => setHover(blog.title as string)}
+                                onMouseLeave={() => setHover('')}
+                            >
+                                <Badge colorScheme='pink' marginBottom={5}>{blog.category}</Badge>
+                                <Heading size='md' marginBottom={3}>{blog.title}</Heading>
+                                <Text as={hover === blog.title ? 'u' : 'abbr'}>{blog.description}</Text>
+                                <Text marginTop={10}>{blog.date}</Text>
+                            </Box>
+                        )
+                    }
+                </Stack>
+            </CardBody>
         </Card>
     )
 }

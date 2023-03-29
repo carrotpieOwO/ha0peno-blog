@@ -1,71 +1,50 @@
 import React from "react";
 import { navigate } from "gatsby"
 import styled from "styled-components";
+import { motion } from "framer-motion";
 import { GatsbyImage, getImage } from "gatsby-plugin-image";
 import defaultImage from '../images/defaultImage.png';
 import { BlogType } from "../pages";
-import { createStyles, Card, Text, Badge, Grid } from '@mantine/core';
-import { motion } from "framer-motion";
+import { Card, Badge, CardBody, CardFooter, SimpleGrid } from '@chakra-ui/react'
 
-
-const useStyles = createStyles((theme) => ({
-    card: {
-        height: '450px',
-        cursor: 'pointer'
-    },
-    title: {
-        fontFamily: `Greycliff CF, ${theme.fontFamily}`,
-        marginBottom: '8px',
-        overflow: 'hidden',
-        whiteSpace: 'nowrap',
-        textOverflow: 'ellipsis',
-    },
-    badge: {
-        background: '#fff0f6',
-        color: '#c41d7f',
-        borderColor: '#ffadd2',
-        borderRadius: '4px',
-        textTransform: 'inherit',
-        fontWeight: 500
-    }
-}));
-
-const MotionCard = styled(motion(Card))``
-
+const ICard = styled(motion(Card))`
+  cursor: pointer;
+  height: fit-content;
+`
+const Footer = styled(CardFooter)`
+    display: block !important;
+`
 export default function Gallery(props: {viewData:BlogType}) {
-    const { classes, theme } = useStyles();
-
     return (
-        <Grid gutter="xl">
-            { 
-                props.viewData.map(blog => 
-                    <Grid.Col sm={6} md={4} lg={4} xl={3} key={blog.title}>
-                        <MotionCard withBorder padding="lg" radius="md" className={classes.card}
-                          whileHover={{ scale: 1.05 }}
-                          onClick={() => navigate(`${blog.href}`)}
-                        >
-                            <Card.Section mb="sm">
-                                {
-                                    blog.thumbnail ?
-                                        <GatsbyImage 
-                                            image={getImage(blog.thumbnail)!} 
-                                            alt='test' 
-                                            style={{height:'270px'}}/>
-                                        :
-                                        <img src={defaultImage} alt="defaultImage"  style={{height:'270px'}}/>
-                                }                            
-                            </Card.Section>
-                            <Badge className={classes.badge}>{blog.category}</Badge>
-                            <Text fw={700} mt="xs" className={classes.title}>
-                                {blog.title}
-                            </Text>
-                            <Text fz="xs" c="dimmed">
-                            {blog.description}
-                            </Text>
-                        </MotionCard>
-                    </Grid.Col>
+        <SimpleGrid spacing={5} templateColumns='repeat(auto-fill, minmax(400px, 1fr))'>
+            {
+                props.viewData.map( blog => 
+                    <ICard
+                        key={blog.href}
+                        whileHover={{ scale: 1.05 }}
+                        onClick={() => navigate(`${blog.href}`)}
+                    >
+                        <CardBody>
+                            {
+                                blog.thumbnail ?
+                                <GatsbyImage 
+                                    image={getImage(blog.thumbnail)!} 
+                                    alt='test' 
+                                    style={{height:'270px'}}/>
+                                :
+                                    <img src={defaultImage} alt="defaultImage"  style={{height:'270px'}}
+                                />
+                            }
+                        </CardBody>
+                        <Footer style={{diplay: 'block'}}>
+                            <Badge colorScheme='pink' style={{marginBottom: '1em'}}>{blog.category}</Badge>
+                            <div style={{minHeight: '60px', fontSize: '14px'}}>{blog.description}</div>
+                            <div style={{marginTop: '1.5em', display: 'flex', justifyContent: 'end', fontSize: '14px'}}>{blog.date}</div>
+                        </Footer>
+                    </ICard>        
                 )
             }
-        </Grid>
+        </SimpleGrid>
+
     )
 }

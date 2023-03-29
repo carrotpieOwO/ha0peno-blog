@@ -1,35 +1,12 @@
 import { navigate } from "gatsby";
 import React, { useEffect } from "react";
-import { ConfigProvider, Layout, theme, Row, Button } from 'antd';
-import styled, { ThemeProvider } from "styled-components";
+import styled  from "styled-components";
 import { motion, useScroll, useAnimation } from "framer-motion";
-import { createGlobalStyle } from "styled-components"
 import dayticon from '../images/dayticon.png';
 import nightticon from '../images/nightticon.png';
 import ThemeSwitch from "./ThemeSwich";
-import useTheme from "../hooks/useTheme";
-
-
-const GlobalStyle = createGlobalStyle`
-   * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", "맑은 고딕", "Nanum Gothic", Dotum, "돋움", Helvetica, sans-serif;
-  }
-  a {
-    cursor: pointer;
-  }
-  
-  #___gatsby,
-  #gatsby-focus-wrapper,
-  html,
-  body {
-    height: 100%;
-  }
-`
-
-const { Content, Footer } = Layout;
+import theme from "../theme/theme"
+import { ChakraProvider, ColorModeScript, useColorMode, Button, Flex, Link } from '@chakra-ui/react'
 
 const Nav = styled(motion.nav)`
     display: flex;
@@ -41,12 +18,6 @@ const Nav = styled(motion.nav)`
     padding-right: 30px;
     gap: 15px;
     z-index: 99;
-`
-const GitBtn = styled(motion.a)`
-    border-radius: 15px;
-    padding: 8px 20px;
-    border: 1px solid black;
-    color: #000;
 `
 const Cover = styled(motion.div)`
     height: 250px;
@@ -68,9 +39,10 @@ const HomeImg = styled(motion.img)`
     width: 250px;
     cursor: pointer;
 `
-const IFooter = styled(Footer)`
+const IFooter = styled.div`
     display: flex;
     justify-content: space-between;
+    padding: 25px 50px;
 `
 const footerVariants = {
     animate: {
@@ -92,12 +64,8 @@ export default function ILayout({children} :LayoutProps) {
     const { scrollY } = useScroll();
     const navAnimation = useAnimation();
 
-    const { themeMode, themeToggler } = useTheme();
-
-    const themeConfig = {
-        algorithm: themeMode === 'light' ? theme.defaultAlgorithm : theme.darkAlgorithm,
-        token: {colorPrimary: '#eb2f96', colorLinkHover: '#ffd6e7' }
-    }
+  
+    const { colorMode, toggleColorMode } = useColorMode()
 
     useEffect(() => {
         scrollY.on('change', () => {
@@ -116,51 +84,47 @@ export default function ILayout({children} :LayoutProps) {
     }, [scrollY]);
 
     return (
-        <ConfigProvider theme={themeConfig}>
-            <GlobalStyle/>
-            <Layout>
+        <>
+            <ColorModeScript initialColorMode={theme.config.initialColorMode} />
+            <ChakraProvider theme={theme}>
                 <Nav animate = {navAnimation}>
-                    <ThemeSwitch themeMode={themeMode} themeToggle={themeToggler}/>
-                    <GitBtn 
-                        href="https://github.com/carrotpieOwO" 
-                        target="_blank"
-                        whileHover={{backgroundColor: 'rgb(255, 255, 255)', color: '#000',}}
-                    >
+                    <ThemeSwitch themeMode={colorMode} themeToggle={toggleColorMode}/>
+                    <Button variant='outline' colorScheme='white' size='sm' onClick={() => navigate("https://github.com/carrotpieOwO" )}>
                         Git
-                    </GitBtn>
+                    </Button>
                 </Nav>
-                <ThemeProvider theme={{themeMode}}>
-                    <Cover animate={{backgroundColor: themeMode === 'light' ? 'rgb(245, 102, 135)' : 'rgb(91, 94, 118)'}}>
-                        ha0peno
-                        <HomeImg
-                            src={themeMode === 'light' ? dayticon : nightticon} 
-                            alt="ha0peno" 
-                            whileHover={{scale: 1.2}}
-                            onClick={() => navigate('/')}
-                        />
-                    </Cover>
-                    <Content style={{ minHeight: '100vh'}}>
+                <Cover animate={{backgroundColor: colorMode === 'light' ? 'rgb(245, 102, 135)' : 'rgb(91, 94, 118)'}}>
+                    ha0peno
+                    <HomeImg
+                        src={colorMode === 'light' ? dayticon : nightticon} 
+                        alt="home" 
+                        whileHover={{scale: 1.2}}
+                        onClick={() => navigate('/')}
+                    />
+                </Cover>
+                <motion.div style={{backgroundColor: colorMode === 'light' ? 'rgb(245, 245, 245)' : 'rgb(0, 0, 0)'}}>
+                    <div style={{ minHeight: '100vh'}}>
                         {children}
-                    </Content>
-                </ThemeProvider>
-                <IFooter>
-                    <div style={{display: 'flex', gap: '20px'}}>
-                        <a href="https://github.com/carrotpieOwO" target="_blank">gitHub</a>
-                        <a href="https://ha0peno.vercel.app" target="_blank">portfolio</a>
                     </div>
-                    <div style={{display: 'flex', gap: '5px', alignItems:'center'}}>
-                        © 2023 ha0peno 
-                        <motion.div 
-                            style={{fontSize: '20px'}}
-                            variants={footerVariants}
-                            animate="animate">
-                                👋🏻
-                        </motion.div> 
-                        Thanks for visiting!
-                    </div>
-                    🔮 Built with Gatsby
-                </IFooter>
-            </Layout>
-        </ConfigProvider>
+                    <IFooter>
+                        <Flex gap={3}>
+                            <Link href="https://github.com/carrotpieOwO" target="_blank">gitHub</Link>
+                            <Link href="https://ha0peno.vercel.app" target="_blank">portfolio</Link>
+                        </Flex>
+                        <Flex>
+                            © 2023 ha0peno 
+                            <motion.div 
+                                style={{fontSize: '20px'}}
+                                variants={footerVariants}
+                                animate="animate">
+                                    👋🏻
+                            </motion.div> 
+                            Thanks for visiting!
+                        </Flex>
+                        🔮 Built with Gatsby
+                    </IFooter>
+                </motion.div>
+            </ChakraProvider>
+        </>
     )
 }

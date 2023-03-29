@@ -2,20 +2,16 @@ import * as React from "react"
 import { Link, HeadFC, PageProps } from "gatsby"
 import ILayout from "../components/ILayout"
 import Seo from "../components/Seo"
-import { Typography } from 'antd';
-
-
-const { Title, Text } = Typography;
+import { Center, Heading, Text } from "@chakra-ui/react"
 
 const NotFoundPage: React.FC<PageProps> = () => {
   return (
     <ILayout>
-      <Title>Page not found</Title>
-        <Text>
-        Sorry 😔, we couldn’t find what you were looking for.
-        </Text>
-        <br/>  
+      <Center height='calc(100vh - 330px)' flexDirection='column'>
+        <Heading>Page not found</Heading>
+        <br/>
         <Link to="/">Go home</Link>.
+      </Center>
     </ILayout>
   )
 }

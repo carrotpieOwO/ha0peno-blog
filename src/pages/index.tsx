@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { graphql, HeadFC, PageProps } from "gatsby"
-import { Row, Radio, Button } from 'antd';
-import { AppstoreTwoTone, ProfileTwoTone } from "@ant-design/icons";
 import ILayout from "../components/ILayout"
 import Seo from "../components/Seo";
 import Gallery from "../components/Gallery";
 import BList from "../components/BList";
 import Search from "../components/Search";
-import { Location } from '@reach/router'
-import queryString from 'query-string'
 import withLocation from "../components/withLocation";
 import PropTypes from "prop-types"
 import styled from "styled-components";
+import { Flex, Button, Stack, ButtonGroup, IconButton } from '@chakra-ui/react'
+import { LayoutGrid, LayoutList } from 'tabler-icons-react';
 
 export type BlogType = {
   title: string | null | undefined;
@@ -55,7 +53,7 @@ function IndexPage({data, search}: PageProps<Queries.BlogsQuery> | any) {
     date: blog.frontmatter?.date,
     category: blog.frontmatter?.category,
     body: blog.body
-  }))
+}))
 
 
   const categories = createCategory(blogData);
@@ -106,27 +104,30 @@ function IndexPage({data, search}: PageProps<Queries.BlogsQuery> | any) {
   return (
     <ILayout>
       <Container>
-        <Row justify='center'>
+        <Stack spacing={4} direction='row' align='center' justify='center'>
         {
-        [...Object.keys(categoryList)].map(category => (
-            <Button 
-              key={category} color="magenta" 
-              style={{marginBottom: '1em', marginRight: '1em'}} 
-              type={category === currentCategory ? 'primary' : 'default'}
-              onClick={() => setCurrentCategory(category)}
-            >
-              {category} ({categoryList[category]})
-            </Button>    
-          ))
+          [...Object.keys(categoryList)].map(category => (
+              <Button
+                key={category}
+                colorScheme='pink'
+                size='sm'
+                variant={category === currentCategory ? 'solid' : 'outline'}
+                onClick={() => setCurrentCategory(category)}
+              >
+                {category} ({categoryList[category]})
+              </Button>    
+            ))
         }
-        </Row>
-        <Row justify="end" align='middle' gutter={20} style={{margin: '20px 0', gap: '10px'}}>
-        <Search search={searchTxt} setSearch={setSearchTxt}/>
-          <Radio.Group size="large" value={mode} onChange={(e) => setMode(e.target.value)}>
-            <Radio.Button value="gallery"><AppstoreTwoTone twoToneColor="#eb2f96"/></Radio.Button>
-            <Radio.Button value="list"><ProfileTwoTone twoToneColor="#eb2f96"/></Radio.Button>
-          </Radio.Group>
-        </Row>    
+        </Stack>
+        <Flex justify="end" align='center' gap={2} marginY={10}>
+          <Search search={searchTxt} setSearch={setSearchTxt}/>
+          <ButtonGroup size='sm' isAttached variant='outline'>
+            <IconButton padding={4} color='pink.500' aria-label='gallery mode' icon={<LayoutGrid />}
+              onClick={() => setMode('gallery')} />
+            <IconButton padding={4} color='pink.500' aria-label='list mode' icon={<LayoutList />}
+              onClick={() => setMode('list')} />
+          </ButtonGroup>
+        </Flex>    
         {
           mode === 'gallery' ?
           <Gallery viewData={viewData}/>

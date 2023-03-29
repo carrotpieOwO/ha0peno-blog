@@ -1,18 +1,18 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Highlight, { defaultProps } from "prism-react-renderer";
-import theme from 'prism-react-renderer/themes/dracula'; // 테마는 github 외에도 많다
-
+import theme from 'prism-react-renderer/themes/dracula'; 
 import { MDXProvider } from "@mdx-js/react";
-import { Divider, Typography, Card } from 'antd';
-import styled from "styled-components";
+import { Heading, Text, Divider, Kbd, Link, useColorMode, Image, ListItem, Code, UnorderedList, OrderedList } from '@chakra-ui/react'
+import { ExternalLinkIcon } from '@chakra-ui/icons'
 
-const { Title, Paragraph, Text, Link } = Typography;
+import styled from "styled-components";
 
 const Blockquote = styled.blockquote`
     padding-inline: 1em !important;
     padding-block: 1em !important;
     border-inline-start: 5px solid pink !important;
-    background: ${props => props.theme.themeMode === 'light' ? '#faf4f4' : 'black'};
+    background: rgba(254, 215, 226, .3);
+    margin: 20px;
 `
 const Circle = styled.div`
     width: 16px;
@@ -30,14 +30,16 @@ const CodeBlockHeader = () => {
     )
 }
 const CodeBlockContainer = styled.div`
-    margin: 1em;
+    margin: 2em;
     background-color: #2c2c2c;
     border: 1px solid #2a2a2a;
     border-radius: 8px;
     padding: 24px;
     overflow: scroll;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
 `
-
 // codeblock 컴포넌트
 const CodeBlock = ({ children }:any) => {
     const className = children.props.className || '';
@@ -45,6 +47,7 @@ const CodeBlock = ({ children }:any) => {
     const language = matches?.groups?.lang ?? '';
     const { props: { children: source } } = children
 
+    console.log('source', source)
     return (
         <Highlight
             {...defaultProps}
@@ -57,11 +60,11 @@ const CodeBlock = ({ children }:any) => {
                     <CodeBlockHeader/>
                     <pre className={className}>
                         {tokens.map((line, i) => (
-                            <div {...getLineProps({ line, key: i })}>
+                            <Code display='block' {...getLineProps({ line, key: i })}>
                                 {line.map((token, key) => (
                                 <span {...getTokenProps({ token, key })} />
                                 ))}
-                            </div>
+                            </Code>
                         ))}
                     </pre>
                 </CodeBlockContainer>
@@ -72,13 +75,16 @@ const CodeBlock = ({ children }:any) => {
 
 interface HeadingProps {
     children: any
-    level: 1 | 2 | 3 | 4 | 5 | undefined
+    as: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | undefined
 }
 
 // 목차생성을 위한 id 부여
-const Heading = ({ children, level }: HeadingProps) => {
+const IHeading = ({ children, as }: HeadingProps) => {
+    // 문자열에서 알파벳, 숫자, 한글 문자를 제외한 모든 문자를 하이픈('-')으로 대체하여 id값 부여
     return (
-        <Title id={children.replace(/\W/g,'-')} level={level} style={{marginTop:'2em'}}>{children}</Title>
+        <Heading id={children.replace(/[^\w\uAC00-\uD7AF]/g, '-')} as={as} padding='2em 0 .5em .5em'>
+            {children}
+        </Heading>
     )
 }
 
@@ -86,21 +92,22 @@ export default function MDXLayout({children} :any) {
     return (
         <MDXProvider
             components={{
-                h1: (props:any) => Heading({...props, level:1}),
-                h2: (props:any) => Heading({...props, level:2}),
-                h3: (props:any) => <Title level={3} {...props}></Title>,
-                h4: (props:any) => <Title level={4} {...props}></Title>,
-                h5: (props:any) => <Title level={5} {...props}></Title>,
-                h6: (props:any) => <Title level={6} {...props}></Title>,
+                h1: (props:any) => IHeading({...props, as: 'h1'}),
+                h2: (props:any) => IHeading({...props, as: 'h2'}),
+                h3: (props:any) => IHeading({...props, as: 'h3'}),
+                h4: (props:any) => <Heading level='h4' {...props}></Heading>,
+                h5: (props:any) => <Heading level='h5' {...props}></Heading>,
+                h6: (props:any) => <Heading level='h6' {...props}></Heading>,
                 hr: (props:any) => <Divider/>,
-                blockquote: (props:any) => <Paragraph style={{fontSize: '20px'}}><Blockquote {...props} /></Paragraph>,
-                ul: (props:any) => <Paragraph><ul {...props}></ul></Paragraph>,
-                li: (props:any) => <Paragraph><li style={{fontSize: '16px'}}{...props}></li></Paragraph>,
-                code: (props:any) => <Text code {...props} />,
+                blockquote: (props:any) => <Blockquote {...props} />,
+                ul: (props:any) => <UnorderedList paddingLeft='5' {...props}></UnorderedList>,
+                ol: (props:any) => <OrderedList paddingLeft='5' {...props}></OrderedList>,
+                li: (props:any) => <ListItem {...props}></ListItem>,
+                code: (props:any) => <Kbd code {...props} />,
                 pre:  (props:any) => CodeBlock(props),
-                img: (props:any) => <img width='100%' style={{margin: '10px 0'}} {...props}/>,
-                p: (props:any) => <Paragraph><Text style={{fontSize: '16px'}} {...props}/></Paragraph>,
-                a: (props:any) => <Link {...props} target="_black"/>
+                img: (props:any) => <Image boxSize='70%' margin='3em auto' {...props}/>,
+                p: (props:any) => <Text marginLeft={5} {...props} />,
+                a: (props:any) => <><Link {...props} isExternal color='purple.500' /><ExternalLinkIcon mx='2px' /></>
             }}
         >
             {children}
