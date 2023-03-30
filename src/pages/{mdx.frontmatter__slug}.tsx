@@ -146,7 +146,7 @@ export default function Detail({data, children}:IBlogPostProps) {
                     </div>
                     {
                         tocItems && toc &&
-                        <div style={{marginLeft: '30px', maxWidth: '200px', position: 'relative'}}>
+                        <div style={{marginLeft: '30px', maxWidth: '20%', position: 'relative'}}>
                             <Toc items={tocItems} />
                         </div>
                     }

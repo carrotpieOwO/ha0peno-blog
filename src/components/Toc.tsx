@@ -26,7 +26,7 @@ export default function Toc({ items }: TOCProps) {
     const isDocument = typeof document !== 'undefined';
 
     const activeItemId = useMemo(() => {
-        // 전달받은 hearItem의 id값으로 각 헤더의 offsetTop 값을 배열로 저장한다.
+        // 전달받은 headerItem의 id값으로 각 헤더의 offsetTop 값을 배열로 저장한다.
         const targetOffsets = items.map((item) => {
             const target = isDocument && document.getElementById(item.id);
             return target?.offsetTop ?? Infinity;

@@ -47,7 +47,6 @@ const CodeBlock = ({ children }:any) => {
     const language = matches?.groups?.lang ?? '';
     const { props: { children: source } } = children
 
-    console.log('source', source)
     return (
         <Highlight
             {...defaultProps}
@@ -76,13 +75,14 @@ const CodeBlock = ({ children }:any) => {
 interface HeadingProps {
     children: any
     as: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | undefined
+    size: string
 }
 
 // 목차생성을 위한 id 부여
-const IHeading = ({ children, as }: HeadingProps) => {
+const IHeading = ({ children, as, size }: HeadingProps) => {
     // 문자열에서 알파벳, 숫자, 한글 문자를 제외한 모든 문자를 하이픈('-')으로 대체하여 id값 부여
     return (
-        <Heading id={children.replace(/[^\w\uAC00-\uD7AF]/g, '-')} as={as} padding='2em 0 .5em .5em'>
+        <Heading id={children.replace(/[^\w\uAC00-\uD7AF]/g, '-')} as={as} size={size} padding='2em 0 .5em .5em'>
             {children}
         </Heading>
     )
@@ -92,9 +92,9 @@ export default function MDXLayout({children} :any) {
     return (
         <MDXProvider
             components={{
-                h1: (props:any) => IHeading({...props, as: 'h1'}),
-                h2: (props:any) => IHeading({...props, as: 'h2'}),
-                h3: (props:any) => IHeading({...props, as: 'h3'}),
+                h1: (props:any) => IHeading({...props, as: 'h1', size:'xl' }),
+                h2: (props:any) => IHeading({...props, as: 'h2', size:'lg' }),
+                h3: (props:any) => IHeading({...props, as: 'h3', size:'md' }),
                 h4: (props:any) => <Heading level='h4' {...props}></Heading>,
                 h5: (props:any) => <Heading level='h5' {...props}></Heading>,
                 h6: (props:any) => <Heading level='h6' {...props}></Heading>,

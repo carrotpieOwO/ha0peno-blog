@@ -1,0 +1,196 @@
+---
+title: Gatsby블로그에 TOC목차 쉽게 만들기
+category: Gatsby
+date: '2023-03-30'
+author: ha0peno
+slug: gatsby-toc
+thumbnail: gatsby-toc.png
+---
+
+# 🐰 구현방법
+> 구현방법은 여러가지가 있겠지만, 가장 쉽고 간단하게 만들기 위해서
+> mdx에서 생성된 header tag에 **id값**을 부여한 뒤, <br/>
+> scoll위치와 id값으로 검색한 header의 위치값을 비교하여
+> 만드는 방법을 선택했다.
+
+## 1. Gatsby-GrapQL에서 toc데이터 받아오기
+- mdx의 heading태그를 별도로 복잡하게 파싱하지 않아도, Gatsby에서는 GrapQL로 tableOfContents를 알아서 파싱해준다.
+![](https://velog.velcdn.com/images/ha0/post/5d2d6f19-ed3a-4082-a1da-8dcb464b66bf/image.png)
+- 그래서 아래와 같이 상세페이지 컴포넌트 `{mdx.frontmatter__slug}.tsx`에서 쿼리문에 추가만 해주면 데이터를 받아와서 그대로 쓸 수 있다.
+```ts
+export const query = graphql`
+    query BlogDetail($frontmatter__slug:String) {
+        mdx(frontmatter: {
+            slug: {
+                eq: $frontmatter__slug // slug값이 일치하는 데이터만 받아옴
+            }
+        }) {
+            body
+            frontmatter {
+                // 페이지에 뿌려주기 위해 받아올 데이터들
+                author
+                category
+                date
+                title
+                slug
+            }
+            tableOfContents // 👈🏻 toc 목차 생성용 데이터!
+        }
+    }
+`
+```
+
+## 2. heading Element에 id값 넣어주기
+> 위 쿼리문에서는 생성된 toc의 목록을 가져오는 것이기 때문에 위 데이터만으로도 목차는 생성할 수 있지만, <br/>
+> 목차를 클릭할 경우 해당 heading태그로 스크롤을 이동해주진 못하기 때문에
+> heading태그가 생성될 때 **id값**을 부여해줘야 한다.
+
+- 나는 **MDXLayout** 컴포넌트에서 `MDXProvider` 로 Gatsby가 변환해준 mdx를 꾸미고 있어서 거기서 id값을 추가했다.
+```tsx
+const IHeading = ({ children, as }: HeadingProps) => {
+    // 문자열에서 알파벳, 숫자, 한글 문자를 제외한 모든 문자를 하이픈('-')으로 대체하여 id값 부여
+    return (
+        <Heading id={children.replace(/[^\w\uAC00-\uD7AF]/g, '-')} as={as} padding='2em 0 .5em .5em'>
+            {children}
+        </Heading>
+    )
+}
+
+export default function MDXLayout({children} :any) {
+    return (
+        <MDXProvider
+            components={{
+                h1: (props:any) => IHeading({...props, as: 'h1'}),
+                h2: (props:any) => IHeading({...props, as: 'h2'}),
+                h3: (props:any) => IHeading({...props, as: 'h3'}),
+
+// (...이하생략)
+```
+
+## 3. TOC데이터 구조 만들기
+> 위 쿼리문에서 받아온 **tableOfContents**데이터 구조를 그대로 사용하면
+ h2는 h1의 내부로 한단계 들어가고, h3은 또 h2의 내부로 들어가기 때문에 목차를 구현하기가 오히려 복잡해보여서
+ `flattenItems` 라는 함수를 만들어서 내부 items도 모두 바깥으로 빼주고,
+ 대신 `sub:true` 옵션을 줘서 h2이상은 목차에서 **들여쓰기**로 표현하기로 했다.
+
+```tsx
+export default function useToc(data) {
+  const flattenItems = (items) => {
+    return items.reduce((array, item) => {
+      // 목차에서 스크롤이동할 수 있도록 id값은 Element의 id값과 동일하게 파싱해줘야함.
+      array.push({
+        id: `${item.title.replace(/[^\w\uAC00-\uD7AF]/g, '-')}`,
+        title: item.title
+      });
+      if (item.items) {
+        // 하위아이템은 구분하여 들여쓰기를 해주기 위해 sub설정을 넣어준다.
+        array.push(...item.items.map((child) => ({ 
+            id: `${child.title.replace(/[^\w\uAC00-\uD7AF]/g, '-')}`,
+            title: child.title,
+            sub: true,
+        })));
+      }
+      return array;
+    }, []);
+  };
+
+  const tocItems = flattenItems(data.mdx?.tableOfContents?.items);
+}
+```
+
+
+### 🌱 데이터 구조
+- 아래와 같이 플랫한 구조로 만들어 주었다.
+![](https://velog.velcdn.com/images/ha0/post/77bee937-fce3-43f7-9fb4-4880840ba136/image.png)
+
+## 4. scroll관련 hook 생성
+- useScroll hook을 만들어서 스크롤위치를 업데이트하고, 목차의 요소 클릭 시 해당 heading태그로 이동시켜주는 함수를 만든다.
+```tsx
+export default function useScrollPosition() {
+  const [scrollPosition, setScrollPosition] = useState<number>(0);
+
+  useEffect(() => {
+    // scroll 이벤트를 등록하여 현재 스크롤 위치를 업데이트한다. 
+    const handleScroll = () => setScrollPosition(window.scrollY);
+    
+    window.addEventListener('scroll', handleScroll);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  const scrollToEl = (id:string) => {
+    // 전달받은 id값으로 스크롤을 이동시킨다. 
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  return { scrollPosition, scrollToEl };
+}
+``` 
+
+## 5. Scroll위치값에 따라 화면에 위치한 heading id 구하기
+```tsx
+const {scrollPosition, scrollToEl} = useScrollPosition();
+
+    // 정적 html파일의 빌드타임에러 방지 (nodejs에서 브라우저전역을 참조할 수 없음)
+    const isDocument = typeof document !== 'undefined';
+
+    const activeItemId = useMemo(() => {
+        // 전달받은 hearItem의 id값으로 각 헤더의 offsetTop 값을 배열로 저장한다.
+        const targetOffsets = items.map((item) => {
+            const target = isDocument && document.getElementById(item.id);
+            return target?.offsetTop ?? Infinity;
+        });
+        
+        // offset배열에서 현재 스크롤 위치보다 offset이 큰 index를 찾는다. 👉🏻 스크롤 위치보다 아래에 있는 div찾기
+        const lastIndex = targetOffsets.findIndex((offset) => offset >= scrollPosition);
+      
+        // 스크롤위치보다 아래에 있는 div가 없을 경우 마지막 목차를 active로 설정한다.
+        if (lastIndex === -1) {
+            return items[items.length - 1]?.id ?? null;
+        }
+
+        // lastIndex가 있다면, 해당 목차를 active로 설정
+        return items[lastIndex - 1]?.id ?? items[0]?.id;
+
+    }, [scrollPosition, items]);
+
+```
+
+## 6. TOC 컴포넌트 생성
+- toc데이터로 리스트를 생성하고, 위에서 구한 activeItemId값이 리스트가 가지고있는 데이터의 id값과 일치하는 요소에 다른 색을 입혀주고,
+- `sub:true`인 요소는 `marginLeft`값을 줘서 들여쓰기를 해주고,
+- 클릭 시 스크롤이동을 시켜주었다.
+- 참고로 toc컴포넌트가 스크롤을 내려올 때 특정 위치에 고정될 수 있도록 toc컴포넌트는 `position:sticky`로 설정함.
+```tsx
+<TList >
+    {
+        items.map((item) => (
+            <ListItem key={item.id} >
+                <Box bg={activeItemId === item.id ? 'rgba(254, 215, 226, .5)' : '-moz-initial'} 
+                    maxWidth='90%' paddingY='1' 
+                    borderLeft='3px solid'
+                    borderLeftColor={activeItemId === item.id ? 'pink.300' : 'pink.100'}
+                    paddingX={5}
+                    onClick={() => scrollToEl(item.id)}
+                    cursor='pointer'
+                >
+                    <Text marginLeft={item.sub ? 2 : 0} 
+                        fontSize='sm' overflow='hidden' whiteSpace='nowrap' textOverflow='ellipsis'>
+                            { item.title }
+                    </Text>
+                </Box>
+            </ListItem>
+        ))
+    }
+</TList>
+```
+
+# 🐰 결과
+ 귀엽게 잘 만들어진 것 같다!! 🤭
+![](https://velog.velcdn.com/images/ha0/post/06bc085b-dff7-4b23-93d2-a3d7c276c4bb/image.gif)
+
