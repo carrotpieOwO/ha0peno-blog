@@ -70,8 +70,8 @@ const config: GatsbyConfig = {
                   description: blog.excerpt,
                   date: blog.frontmatter.date,
                   title: blog.frontmatter.title,
-                  url: site.siteMetadata.siteUrl + blog.frontmatter.slug,
-                  guid: site.siteMetadata.siteUrl + blog.frontmatter.slug,
+                  url: `${site.siteMetadata.siteUrl}/${blog.frontmatter.slug}`,
+                  guid: `${site.siteMetadata.siteUrl}/${blog.frontmatter.slug}`,
                   custom_elements: [{ 'content:encoded': blog.body }],
                 })
               })
